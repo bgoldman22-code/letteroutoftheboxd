@@ -15,22 +15,21 @@ export interface JobStatus {
 }
 
 function getJobStore() {
-  // In Netlify Functions context, these are automatically provided
-  // But we need to explicitly pass them for Blobs to work
+  // Use explicit site ID and token from environment
   const siteID = process.env.NETLIFY_SITE_ID || '58b620ff-bd3c-44c0-8f6f-0ab0ce8f724d';
-  const token = process.env.NETLIFY_BLOBS_CONTEXT;
+  const token = process.env.NETLIFY_AUTH_TOKEN;
   
   if (token) {
-    // Use the automatic context token
     return getStore({
       name: 'jobs',
       siteID,
       token,
     });
-  } else {
-    // Fallback to simple name (should work in deployed environment)
-    return getStore('jobs');
   }
+  
+  // Fallback to simple name (shouldn't happen in production)
+  console.warn('NETLIFY_AUTH_TOKEN not found, using default store config');
+  return getStore('jobs');
 }
 
 export function generateJobId(): string {
