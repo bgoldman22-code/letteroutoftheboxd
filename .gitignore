@@ -70,3 +70,6 @@ coverage/
 *.key
 *.pem
 .vercel
+
+# Local Netlify folder
+.netlify
