@@ -21,6 +21,55 @@ interface RecommendationData {
   recommendation_map?: any;
 }
 
+interface JobStatus {
+  jobId: string;
+  status: 'pending' | 'processing' | 'completed' | 'error';
+  progress: {
+    current: number;
+    total: number;
+    currentItem?: string;
+  };
+  result?: any;
+  error?: string;
+}
+
+// Helper function to poll job status
+async function pollJobStatus(jobId: string, onProgress?: (status: JobStatus) => void): Promise<any> {
+  const maxAttempts = 180; // 3 minutes max (180 * 1s)
+  let attempts = 0;
+
+  while (attempts < maxAttempts) {
+    const response = await fetch(`/.netlify/functions/job-status?jobId=${jobId}`);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Job not found');
+      }
+      throw new Error(`Failed to check job status: ${response.statusText}`);
+    }
+
+    const status: JobStatus = await response.json();
+
+    if (onProgress) {
+      onProgress(status);
+    }
+
+    if (status.status === 'completed') {
+      return status.result;
+    }
+
+    if (status.status === 'error') {
+      throw new Error(status.error || 'Job failed');
+    }
+
+    // Wait 1 second before polling again
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    attempts++;
+  }
+
+  throw new Error('Job timeout - please try again');
+}
+
 export default function Home() {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
@@ -68,9 +117,9 @@ export default function Home() {
       }
       console.log(`✅ Profile scraped: ${profileData.all_rated_movies.length} rated movies, ${profileData.loved_movies.length} loved`);
 
-      // Step 2: Enrich movies with OMDb data
-      setLoadingStep(`Enriching ${profileData.all_rated_movies.length} movies with OMDb data...`);
-      console.log('🎬 Step 2/4: Enriching movies with OMDb data...');
+      // Step 2: Enrich movies with OMDb data (async job)
+      setLoadingStep(`Starting enrichment for ${profileData.all_rated_movies.length} movies...`);
+      console.log('🎬 Step 2/4: Starting movie enrichment...');
       const enrichResponse = await fetch('/.netlify/functions/enrich-movies', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -78,7 +127,7 @@ export default function Home() {
       });
 
       if (!enrichResponse.ok) {
-        let errorMessage = 'Failed to enrich movies';
+        let errorMessage = 'Failed to start enrichment';
         try {
           const errorData = await enrichResponse.json();
           errorMessage = errorData.error || errorMessage;
@@ -88,18 +137,23 @@ export default function Home() {
         throw new Error(errorMessage);
       }
 
-      let enrichedMovies;
-      try {
-        const responseData = await enrichResponse.json();
-        enrichedMovies = responseData.data;
-      } catch (e) {
-        throw new Error('Invalid response from movie enrichment. The response may be too large or incomplete.');
-      }
+      const enrichJobResponse = await enrichResponse.json();
+      const enrichJobId = enrichJobResponse.jobId;
+      console.log(`📋 Enrichment job started: ${enrichJobId}`);
+
+      // Poll for enrichment completion
+      const enrichedMovies = await pollJobStatus(enrichJobId, (status) => {
+        setLoadingStep(
+          `Enriching movies: ${status.progress.current}/${status.progress.total}${
+            status.progress.currentItem ? ` - ${status.progress.currentItem}` : ''
+          }`
+        );
+      });
       console.log(`✅ Enriched ${enrichedMovies.length} movies`);
 
-      // Step 3: Analyze movies with 62-dimension AI model
-      setLoadingStep(`Analyzing ${enrichedMovies.length} movies with Elite 62-Dimension Model (this may take a minute)...`);
-      console.log('🎬 Step 3/4: Analyzing with Elite 62-Dimension Model (this may take a minute)...');
+      // Step 3: Analyze movies with 62-dimension AI model (async job)
+      setLoadingStep(`Starting AI analysis for ${enrichedMovies.length} movies...`);
+      console.log('🎬 Step 3/4: Starting Elite 62-Dimension AI Analysis...');
       const analyzeResponse = await fetch('/.netlify/functions/analyze-movie', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -107,7 +161,7 @@ export default function Home() {
       });
 
       if (!analyzeResponse.ok) {
-        let errorMessage = 'Failed to analyze movies';
+        let errorMessage = 'Failed to start analysis';
         try {
           const errorData = await analyzeResponse.json();
           errorMessage = errorData.error || errorMessage;
@@ -117,13 +171,18 @@ export default function Home() {
         throw new Error(errorMessage);
       }
 
-      let analyzedMovies;
-      try {
-        const responseData = await analyzeResponse.json();
-        analyzedMovies = responseData.data;
-      } catch (e) {
-        throw new Error('Invalid response from AI analysis. The response may be too large or incomplete.');
-      }
+      const analyzeJobResponse = await analyzeResponse.json();
+      const analyzeJobId = analyzeJobResponse.jobId;
+      console.log(`📋 Analysis job started: ${analyzeJobId}`);
+
+      // Poll for analysis completion
+      const analyzedMovies = await pollJobStatus(analyzeJobId, (status) => {
+        setLoadingStep(
+          `Analyzing movies: ${status.progress.current}/${status.progress.total}${
+            status.progress.currentItem ? ` - ${status.progress.currentItem}` : ''
+          }`
+        );
+      });
       console.log(`✅ Analyzed ${analyzedMovies.length} movies with 62 dimensions`);
 
       // Step 4: Generate recommendations

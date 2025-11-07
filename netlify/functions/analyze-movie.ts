@@ -1,5 +1,12 @@
 import { Handler } from '@netlify/functions';
 import OpenAI from 'openai';
+import {
+  generateJobId,
+  createJob,
+  updateJobProgress,
+  completeJob,
+  failJob,
+} from './lib/jobTracker';
 
 interface EnrichedMovie {
   title: string;
@@ -231,38 +238,26 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const openai = new OpenAI({ apiKey: openaiApiKey });
+    // Generate job ID and return immediately
+    const jobId = generateJobId();
+    createJob(jobId, movies.length);
 
-    console.log(`🎬 Analyzing ${movies.length} movies with Elite 62-Dimension Model...`);
+    console.log(`🎬 Starting analysis job ${jobId} for ${movies.length} movies...`);
 
-    // Analyze movies with delays to avoid rate limits
-    const analyzedMovies = [];
-    
-    for (const movie of movies.slice(0, 20)) { // Limit to 20 for serverless timeout
-      try {
-        const analysis = await analyzeMovieWithAI(movie, openai);
-        analyzedMovies.push({
-          ...movie,
-          elite_analysis: analysis,
-        });
-        console.log(`✅ Analyzed: ${movie.title}`);
-        
-        // Delay to respect rate limits
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      } catch (error: any) {
-        console.error(`❌ Failed to analyze ${movie.title}:`, error.message);
-        // Continue with other movies
-      }
-    }
+    // Start background processing (don't await)
+    processAnalysis(jobId, movies, openaiApiKey).catch((error) => {
+      console.error('Background analysis error:', error);
+      failJob(jobId, error.message);
+    });
 
-    console.log(`✅ Successfully analyzed ${analyzedMovies.length}/${movies.length} movies`);
-
+    // Return job ID immediately
     return {
-      statusCode: 200,
+      statusCode: 202, // Accepted
       headers,
       body: JSON.stringify({
         success: true,
-        data: analyzedMovies,
+        jobId,
+        message: `Analysis job started for ${movies.length} movies`,
       }),
     };
 
@@ -273,8 +268,42 @@ export const handler: Handler = async (event) => {
       headers,
       body: JSON.stringify({
         success: false,
-        error: error.message || 'Failed to analyze movies',
+        error: error.message || 'Failed to start analysis',
       }),
     };
   }
 };
+
+// Background processing function
+async function processAnalysis(
+  jobId: string,
+  movies: EnrichedMovie[],
+  openaiApiKey: string
+): Promise<void> {
+  const openai = new OpenAI({ apiKey: openaiApiKey });
+  const analyzedMovies = [];
+
+  for (let i = 0; i < movies.length; i++) {
+    const movie = movies[i];
+    
+    updateJobProgress(jobId, i, `Analyzing ${movie.title} (${movie.year})`);
+
+    try {
+      const analysis = await analyzeMovieWithAI(movie, openai);
+      analyzedMovies.push({
+        ...movie,
+        elite_analysis: analysis,
+      });
+      console.log(`✅ Analyzed: ${movie.title}`);
+
+      // Small delay to respect rate limits
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error: any) {
+      console.error(`❌ Failed to analyze ${movie.title}:`, error.message);
+      // Continue with other movies even if one fails
+    }
+  }
+
+  console.log(`✅ Analysis job ${jobId} completed: ${analyzedMovies.length}/${movies.length} movies`);
+  completeJob(jobId, analyzedMovies);
+}

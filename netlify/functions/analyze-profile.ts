@@ -87,8 +87,8 @@ async function scrapeLetterboxdProfile(username: string): Promise<ProfileData> {
       username,
       total_films: totalFilms,
       films_this_year: filmsThisYear,
-      loved_movies: lovedMovies.slice(0, 50), // Limit to 50
-      all_rated_movies: allRatedMovies.slice(0, 200), // Limit to 200
+      loved_movies: lovedMovies.slice(0, 50), // Top 50 loved movies
+      all_rated_movies: allRatedMovies.slice(0, 200), // Limit to 200 for analysis
     };
     
   } catch (error: any) {
