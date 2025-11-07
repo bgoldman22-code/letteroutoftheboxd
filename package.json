@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build", 
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "scrape": "python3 scripts/letterboxd_scraper.py",
-    "analyze": "python3 scripts/movie_analyzer.py", 
+    "analyze": "python3 scripts/movie_analyzer.py",
     "ai-analyze": "python3 scripts/ai_movie_analyzer.py",
     "movie-data": "python3 scripts/multi_api_movie_service.py",
     "test-apis": "python3 scripts/alternative_movie_api.py",
@@ -18,7 +18,7 @@
     "axios": "^1.6.2",
     "chart.js": "^4.4.0",
     "cheerio": "^1.0.0",
-    "d3": "^7.8.5",
+    "d3": "^7.9.0",
     "mongodb": "^6.3.0",
     "next": "15.0.1",
     "openai": "^6.8.1",
@@ -31,11 +31,11 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "autoprefixer": "^10.0.1",
+    "autoprefixer": "^10.4.21",
     "eslint": "^8",
     "eslint-config-next": "15.0.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.3.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18",
     "typescript": "^5"
   }
 }
