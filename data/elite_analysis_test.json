@@ -1,0 +1,937 @@
+{
+  "movie": {
+    "title": "Blade Runner 2049",
+    "year": 2017,
+    "director": "Denis Villeneuve",
+    "cast": [
+      "Harrison Ford",
+      "Ryan Gosling",
+      "Ana de Armas"
+    ],
+    "genres": [
+      "Action",
+      "Drama",
+      "Mystery"
+    ],
+    "plot_summary": "Young Blade Runner K's discovery of a long-buried secret leads him to track down former Blade Runner Rick Deckard, who's been missing for thirty years.",
+    "runtime": "164 min",
+    "imdb_rating": "8.0",
+    "imdb_id": "tt1856101",
+    "poster_url": "https://m.media-amazon.com/images/M/MV5BNzA1Njg4NzYxOV5BMl5BanBnXkFtZTgwODk5NjU3MzI@._V1_SX300.jpg",
+    "ratings": {
+      "imdb": "8.0/10",
+      "rotten_tomatoes": "88%",
+      "metacritic": "81/100"
+    },
+    "source": "omdb",
+    "primary_source": "omdb",
+    "streaming": {
+      "streaming_sources": [
+        {
+          "name": "Sony LIV",
+          "type": "sub",
+          "url": "https://www.sonyliv.com/movies/blade-runner-2049-1090426687",
+          "price": null,
+          "currency": "USD"
+        },
+        {
+          "name": "Netflix",
+          "type": "sub",
+          "url": "https://www.netflix.com/title/80185760",
+          "price": null,
+          "currency": "USD"
+        },
+        {
+          "name": "Prime Video",
+          "type": "sub",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": null,
+          "currency": "USD"
+        },
+        {
+          "name": "Prime Video",
+          "type": "sub",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": null,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://watch.amazon.co.uk/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 3.49,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://watch.amazon.co.uk/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 3.49,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://watch.amazon.co.uk/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "VUDU",
+          "type": "rent",
+          "url": "https://athome.fandango.com/content/browse/details/Blade-Runner-2049/868763",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "VUDU",
+          "type": "rent",
+          "url": "https://athome.fandango.com/content/browse/details/Blade-Runner-2049/868763",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "VUDU",
+          "type": "rent",
+          "url": "https://athome.fandango.com/content/browse/details/Blade-Runner-2049/868763",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Spectrum On Demand",
+          "type": "rent",
+          "url": "https://ondemand.spectrum.net/movies/12565017/blade-runner-2049/",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Spectrum On Demand",
+          "type": "rent",
+          "url": "https://ondemand.spectrum.net/movies/12565017/blade-runner-2049/",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "rent",
+          "url": "https://www.rakuten.tv/uk/movies/blade-runner-2049",
+          "price": 3.49,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "rent",
+          "url": "https://www.rakuten.tv/uk/movies/blade-runner-2049",
+          "price": 4.49,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/au/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 2.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/au/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 2.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/au/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 2.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "rent",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "rent",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Fetch TV",
+          "type": "rent",
+          "url": "https://www.fetchtv.com.au/movie/details/16356",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/br/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 11.9,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/br/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 11.9,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/br/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 11.9,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/es/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/es/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/es/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "rent",
+          "url": "https://www.rakuten.tv/es/movies/blade-runner-2049",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "rent",
+          "url": "https://www.rakuten.tv/es/movies/blade-runner-2049",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 11.9,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 11.9,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://watch.amazon.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 3.79,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://watch.amazon.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://watch.amazon.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/gb/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/gb/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/gb/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/ca/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/ca/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/ca/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/us/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/us/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/us/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/in/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1298364367",
+          "price": 129,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "rent",
+          "url": "https://tv.apple.com/in/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1298364367",
+          "price": 129,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "rent",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 100,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "rent",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 99,
+          "currency": "USD"
+        },
+        {
+          "name": "Sky Store",
+          "type": "rent",
+          "url": "https://www.skystore.com/product/blade-runner-2049/7d15be7b-3ca7-46c5-a7c5-2f466f69e491",
+          "price": 3.49,
+          "currency": "USD"
+        },
+        {
+          "name": "Plex",
+          "type": "rent",
+          "url": "https://watch.plex.tv/movie/blade-runner-2049?utm_content=5d776b95594b2b001e6de3f3&utm_medium=deeplink&utm_source=",
+          "price": 2.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Plex",
+          "type": "rent",
+          "url": "https://watch.plex.tv/movie/blade-runner-2049?utm_content=5d776b95594b2b001e6de3f3&utm_medium=deeplink&utm_source=",
+          "price": 2.99,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "rent",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Cineplex",
+          "type": "rent",
+          "url": "https://www.cosmogo.com/#!/hero/cp340102",
+          "price": 5.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Plex",
+          "type": "rent",
+          "url": "https://watch.plex.tv/movie/blade-runner-2049?utm_content=5d776b95594b2b001e6de3f3&utm_medium=deeplink&utm_source=",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Plex",
+          "type": "rent",
+          "url": "https://watch.plex.tv/movie/blade-runner-2049?utm_content=5d776b95594b2b001e6de3f3&utm_medium=deeplink&utm_source=",
+          "price": 3.99,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "rent",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 3.49,
+          "currency": "USD"
+        },
+        {
+          "name": "Clarovideo",
+          "type": "rent",
+          "url": "https://www.clarovideo.com/brasil/vcard/homeuser/Blade-Runner-2049/761618",
+          "price": 6.9,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://watch.amazon.co.uk/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://watch.amazon.co.uk/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://watch.amazon.co.uk/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "VUDU",
+          "type": "buy",
+          "url": "https://athome.fandango.com/content/browse/details/Blade-Runner-2049/868763",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "VUDU",
+          "type": "buy",
+          "url": "https://athome.fandango.com/content/browse/details/Blade-Runner-2049/868763",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "VUDU",
+          "type": "buy",
+          "url": "https://athome.fandango.com/content/browse/details/Blade-Runner-2049/868763",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "buy",
+          "url": "https://www.rakuten.tv/uk/movies/blade-runner-2049",
+          "price": 5.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "buy",
+          "url": "https://www.rakuten.tv/uk/movies/blade-runner-2049",
+          "price": 8.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "buy",
+          "url": "https://www.rakuten.tv/uk/movies/blade-runner-2049",
+          "price": 8.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/au/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/au/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/au/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "buy",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 4.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Fetch TV",
+          "type": "buy",
+          "url": "https://www.fetchtv.com.au/movie/details/16356",
+          "price": 17.98,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/br/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 24.9,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/br/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 24.9,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/br/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 24.9,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/es/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 5.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/es/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 9.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/es/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 9.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "buy",
+          "url": "https://www.rakuten.tv/es/movies/blade-runner-2049",
+          "price": 5.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "buy",
+          "url": "https://www.rakuten.tv/es/movies/blade-runner-2049",
+          "price": 9.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Rakuten TV",
+          "type": "buy",
+          "url": "https://www.rakuten.tv/es/movies/blade-runner-2049",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 24.9,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 24.9,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://watch.amazon.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://watch.amazon.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://watch.amazon.com/detail?gti=amzn1.dv.gti.c5d0912f-4e6c-46f0-9f52-bdf1f17e2841",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/gb/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/gb/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/gb/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1287369934",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 5.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Amazon",
+          "type": "buy",
+          "url": "https://app.primevideo.com/detail?gti=amzn1.dv.gti.54af725d-4434-ea14-b98b-af121a712577",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/ca/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/ca/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/ca/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/us/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/us/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/us/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1288813671",
+          "price": 14.99,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/in/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1298364367",
+          "price": 399,
+          "currency": "USD"
+        },
+        {
+          "name": "AppleTV",
+          "type": "buy",
+          "url": "https://tv.apple.com/in/movie/blade-runner-2049/umc.cmc.6i5xn1k0lcpoj80xsfmqmthy1?at=1000l3V2&ct=app_tv&itscg=30200&itsct=&playableId=tvs.sbd.9001%3A1298364367",
+          "price": 499,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "buy",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 460,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "buy",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 590,
+          "currency": "USD"
+        },
+        {
+          "name": "Sky Store",
+          "type": "buy",
+          "url": "https://www.skystore.com/product/blade-runner-2049/7d15be7b-3ca7-46c5-a7c5-2f466f69e491",
+          "price": 7.99,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "buy",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 9.99,
+          "currency": "USD"
+        },
+        {
+          "name": "Cineplex",
+          "type": "buy",
+          "url": "https://www.cosmogo.com/#!/hero/cp340102",
+          "price": 15.99,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "buy",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 6.99,
+          "currency": "USD"
+        },
+        {
+          "name": "YouTube",
+          "type": "buy",
+          "url": "https://www.youtube.com/results?search_query=Blade+Runner+2049%2Bmovie",
+          "price": 7.99,
+          "currency": "USD"
+        }
+      ],
+      "total_sources": 116
+    }
+  },
+  "elite_analysis": {
+    "dimensional_scores": {
+      "color_palette_psychology": 5.5,
+      "lighting_philosophy": 6.0,
+      "camera_movement_personality": 3.0,
+      "shot_composition_philosophy": 2.5,
+      "depth_of_field_psychology": 6.0,
+      "texture_and_grain": 4.0,
+      "aspect_ratio_emotional_frame": 1.0,
+      "spatial_density": 6.5,
+      "cinematic_realism_spectrum": 6.0,
+      "blocking_and_performance_space": 4.0,
+      "color_temperature": 2.0,
+      "lens_distortion_and_perspective": 3.0,
+      "shadow_ratio": 6.5,
+      "frame_rate_and_motion": 1.0,
+      "visual_motif_repetition": 6.0,
+      "editing_tempo": 2.0,
+      "narrative_rhythm": 3.0,
+      "temporal_structure": 3.0,
+      "montage_philosophy": 2.5,
+      "scene_length_variance": 4.0,
+      "ellipsis_and_gaps": 5.0,
+      "transition_style": 3.0,
+      "rhythm_acceleration": 3.0,
+      "score_emotional_temperature": 2.0,
+      "score_density": 6.0,
+      "music_function": 1.5,
+      "soundscape_texture": 6.5,
+      "diegetic_vs_nondiegetic_ratio": 6.0,
+      "sonic_interiority": 5.5,
+      "silence_as_tool": 5.0,
+      "vocal_treatment": 4.0,
+      "rhythmic_percussion": 6.0,
+      "philosophical_stance": 6.0,
+      "narrative_tension_source": 6.0,
+      "moral_complexity": 6.5,
+      "ending_resolution": 5.5,
+      "power_dynamics": 6.0,
+      "intimacy_scale": 3.0,
+      "dialogue_philosophy": 5.0,
+      "relationship_to_class": 5.0,
+      "body_and_physicality": 4.0,
+      "time_relationship": 6.0,
+      "hope_quotient": 5.5,
+      "political_consciousness": 6.0,
+      "emotional_temperature": 3.0,
+      "catharsis_availability": 4.0,
+      "tonal_consistency": 4.0,
+      "empathy_requirement": 5.0,
+      "beauty_priority": 6.0,
+      "sensory_immersion": 6.5,
+      "vulnerability_exposure": 5.0,
+      "mystery_comfort": 6.0,
+      "artifice_awareness": 5.0,
+      "suffering_tolerance": 5.5,
+      "craft_precision_vs_rawness": 6.5,
+      "art_cinema_vs_pop_cinema_mode": 3.5,
+      "narrative_ambition_level": 6.5,
+      "irony_sincerity_register": 3.0,
+      "emotional_weight_tolerance": 5.5,
+      "performance_style_preference": 4.5,
+      "script_construction_visibility": 5.0,
+      "auteur_intentionality_desire": 6.5
+    },
+    "human_condition_themes": [
+      "loneliness",
+      "identity",
+      "grief"
+    ],
+    "core_essence": "Blade Runner 2049 explores the depths of human identity and existential loneliness through a visually stunning and philosophically rich narrative. It questions the nature of humanity in a world where the line between human and machine is blurred.",
+    "viewer_resonance": "Viewers who appreciate philosophical depth, visual artistry, and a slow-burn narrative will connect deeply with this film. It resonates with those who ponder the essence of existence and the search for meaning in a dystopian future.",
+    "aesthetic_signature": "The film's unique aesthetic is defined by its lush, atmospheric visuals, intricate sound design, and a haunting score that together create an immersive, introspective experience. Its use of chiaroscuro lighting and expansive, desolate landscapes evoke a sense of isolation and introspection.",
+    "legacy_analysis": {
+      "visual_style": [
+        "The film's unique aesthetic is defined by its lush, atmospheric visuals, intricate sound design, and a haunting score that together create an immersive, introspective experience. Its use of chiaroscuro lighting and expansive, desolate landscapes evoke a sense of isolation and introspection."
+      ],
+      "themes": [
+        "loneliness",
+        "identity",
+        "grief"
+      ],
+      "mood": "Blade Runner 2049 explores the depths of human ide",
+      "pacing": "measured",
+      "influences": [],
+      "innovation": "The film's unique aesthetic is defined by its lush, atmospheric visuals, intricate sound design, and a haunting score that together create an immersive, introspective experience. Its use of chiaroscuro lighting and expansive, desolate landscapes evoke a sense of isolation and introspection.",
+      "emotional_tone": "Viewers who appreciate philosophical depth, visual",
+      "viewer_experience": "Viewers who appreciate philosophical depth, visual artistry, and a slow-burn narrative will connect deeply with this film. It resonates with those who ponder the essence of existence and the search for meaning in a dystopian future.",
+      "curatorial_notes": "Blade Runner 2049 explores the depths of human identity and existential loneliness through a visually stunning and philosophically rich narrative. It questions the nature of humanity in a world where the line between human and machine is blurred."
+    }
+  }
+}

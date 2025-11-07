@@ -1,0 +1,133 @@
+[
+  {
+    "title": "The Dark Knight",
+    "year": 2008,
+    "director": "Christopher Nolan",
+    "cast": [
+      "Christian Bale",
+      "Heath Ledger",
+      "Aaron Eckhart"
+    ],
+    "genres": [
+      "Action",
+      "Crime",
+      "Drama"
+    ],
+    "plot_summary": "When a menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman, James Gordon and Harvey Dent must work together to put an end to the madness.",
+    "runtime": "152 min",
+    "imdb_rating": "9.1",
+    "imdb_id": "tt0468569",
+    "poster_url": "https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_SX300.jpg",
+    "ratings": {
+      "imdb": "9.1/10",
+      "rotten_tomatoes": "94%",
+      "metacritic": "85/100"
+    },
+    "source": "omdb",
+    "primary_source": "omdb"
+  },
+  {
+    "title": "Pulp Fiction",
+    "year": 1994,
+    "director": "Quentin Tarantino",
+    "cast": [
+      "John Travolta",
+      "Uma Thurman",
+      "Samuel L. Jackson"
+    ],
+    "genres": [
+      "Crime",
+      "Drama"
+    ],
+    "plot_summary": "The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.",
+    "runtime": "154 min",
+    "imdb_rating": "8.8",
+    "imdb_id": "tt0110912",
+    "poster_url": "https://m.media-amazon.com/images/M/MV5BYTViYTE3ZGQtNDBlMC00ZTAyLTkyODMtZGRiZDg0MjA2YThkXkEyXkFqcGc@._V1_SX300.jpg",
+    "ratings": {
+      "imdb": "8.8/10",
+      "rotten_tomatoes": "92%",
+      "metacritic": "95/100"
+    },
+    "source": "omdb",
+    "primary_source": "omdb"
+  },
+  {
+    "title": "The Shawshank Redemption",
+    "year": 1994,
+    "director": "Frank Darabont",
+    "cast": [
+      "Tim Robbins",
+      "Morgan Freeman",
+      "Bob Gunton"
+    ],
+    "genres": [
+      "Drama"
+    ],
+    "plot_summary": "A banker convicted of uxoricide forms a friendship over a quarter century with a hardened convict, while maintaining his innocence and trying to remain hopeful through simple compassion.",
+    "runtime": "142 min",
+    "imdb_rating": "9.3",
+    "imdb_id": "tt0111161",
+    "poster_url": "https://m.media-amazon.com/images/M/MV5BMDAyY2FhYjctNDc5OS00MDNlLThiMGUtY2UxYWVkNGY2ZjljXkEyXkFqcGc@._V1_SX300.jpg",
+    "ratings": {
+      "imdb": "9.3/10",
+      "rotten_tomatoes": "89%",
+      "metacritic": "82/100"
+    },
+    "source": "omdb",
+    "primary_source": "omdb"
+  },
+  {
+    "title": "Inception",
+    "year": 2010,
+    "director": "Christopher Nolan",
+    "cast": [
+      "Leonardo DiCaprio",
+      "Joseph Gordon-Levitt",
+      "Elliot Page"
+    ],
+    "genres": [
+      "Action",
+      "Adventure",
+      "Sci-Fi"
+    ],
+    "plot_summary": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O., but his tragic past may doom the project and his team to disaster.",
+    "runtime": "148 min",
+    "imdb_rating": "8.8",
+    "imdb_id": "tt1375666",
+    "poster_url": "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
+    "ratings": {
+      "imdb": "8.8/10",
+      "rotten_tomatoes": "87%",
+      "metacritic": "74/100"
+    },
+    "source": "omdb",
+    "primary_source": "omdb"
+  },
+  {
+    "title": "The Godfather",
+    "year": 1972,
+    "director": "Francis Ford Coppola",
+    "cast": [
+      "Marlon Brando",
+      "Al Pacino",
+      "James Caan"
+    ],
+    "genres": [
+      "Crime",
+      "Drama"
+    ],
+    "plot_summary": "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.",
+    "runtime": "175 min",
+    "imdb_rating": "9.2",
+    "imdb_id": "tt0068646",
+    "poster_url": "https://m.media-amazon.com/images/M/MV5BNGEwYjgwOGQtYjg5ZS00Njc1LTk2ZGEtM2QwZWQ2NjdhZTE5XkEyXkFqcGc@._V1_SX300.jpg",
+    "ratings": {
+      "imdb": "9.2/10",
+      "rotten_tomatoes": "97%",
+      "metacritic": "100/100"
+    },
+    "source": "omdb",
+    "primary_source": "omdb"
+  }
+]
