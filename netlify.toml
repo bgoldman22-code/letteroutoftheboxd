@@ -8,6 +8,11 @@
 [build.environment]
   NODE_VERSION = "20"
 
+[functions]
+  # Increase timeout for AI analysis (default is 10s, max is 26s on free tier)
+  # For longer processing, would need Pro plan (up to 15 minutes background functions)
+  node_bundler = "esbuild"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

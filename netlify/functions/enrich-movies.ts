@@ -1,12 +1,5 @@
 import { Handler } from '@netlify/functions';
 import axios from 'axios';
-import {
-  generateJobId,
-  createJob,
-  updateJobProgress,
-  completeJob,
-  failJob,
-} from './lib/jobTracker';
 
 interface Movie {
   title: string;
@@ -106,26 +99,29 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // Generate job ID and return immediately
-    const jobId = generateJobId();
-    createJob(jobId, movies.length);
+    console.log(`🎬 Enriching ${movies.length} movies...`);
 
-    console.log(`🎬 Starting enrichment job ${jobId} for ${movies.length} movies...`);
+    // Enrich movies with delays to respect API rate limits
+    const enrichedMovies: EnrichedMovie[] = [];
+    
+    // Process up to 100 movies to stay within timeout
+    for (let i = 0; i < Math.min(movies.length, 100); i++) {
+      const movie = movies[i];
+      const enriched = await enrichMovieWithOMDb(movie, omdbApiKey);
+      enrichedMovies.push(enriched);
+      
+      // Small delay to respect API rate limits
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
 
-    // Start background processing (don't await)
-    processEnrichment(jobId, movies, omdbApiKey).catch((error) => {
-      console.error('Background enrichment error:', error);
-      failJob(jobId, error.message);
-    });
+    console.log(`✅ Enriched ${enrichedMovies.length} movies`);
 
-    // Return job ID immediately
     return {
-      statusCode: 202, // Accepted
+      statusCode: 200,
       headers,
       body: JSON.stringify({
         success: true,
-        jobId,
-        message: `Enrichment job started for ${movies.length} movies`,
+        data: enrichedMovies,
       }),
     };
 
@@ -136,32 +132,8 @@ export const handler: Handler = async (event) => {
       headers,
       body: JSON.stringify({
         success: false,
-        error: error.message || 'Failed to start enrichment',
+        error: error.message || 'Failed to enrich movies',
       }),
     };
   }
 };
-
-// Background processing function
-async function processEnrichment(
-  jobId: string,
-  movies: Movie[],
-  omdbApiKey: string
-): Promise<void> {
-  const enrichedMovies: EnrichedMovie[] = [];
-
-  for (let i = 0; i < movies.length; i++) {
-    const movie = movies[i];
-    
-    updateJobProgress(jobId, i, `Enriching ${movie.title} (${movie.year})`);
-    
-    const enriched = await enrichMovieWithOMDb(movie, omdbApiKey);
-    enrichedMovies.push(enriched);
-
-    // Small delay to respect API rate limits
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
-  console.log(`✅ Enrichment job ${jobId} completed: ${enrichedMovies.length} movies`);
-  completeJob(jobId, enrichedMovies);
-}
