@@ -69,3 +69,4 @@ coverage/
 # API Keys (extra safety)
 *.key
 *.pem
+.vercel
