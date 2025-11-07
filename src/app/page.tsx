@@ -49,11 +49,23 @@ export default function Home() {
       });
 
       if (!profileResponse.ok) {
-        const errorData = await profileResponse.json();
-        throw new Error(errorData.error || 'Failed to scrape profile');
+        let errorMessage = 'Failed to scrape profile';
+        try {
+          const errorData = await profileResponse.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = `HTTP ${profileResponse.status}: ${profileResponse.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
-      const { data: profileData } = await profileResponse.json();
+      let profileData;
+      try {
+        const responseData = await profileResponse.json();
+        profileData = responseData.data;
+      } catch (e) {
+        throw new Error('Invalid response from profile scraper. The response may be too large or incomplete.');
+      }
       console.log(`✅ Profile scraped: ${profileData.all_rated_movies.length} rated movies, ${profileData.loved_movies.length} loved`);
 
       // Step 2: Enrich movies with OMDb data
@@ -66,11 +78,23 @@ export default function Home() {
       });
 
       if (!enrichResponse.ok) {
-        const errorData = await enrichResponse.json();
-        throw new Error(errorData.error || 'Failed to enrich movies');
+        let errorMessage = 'Failed to enrich movies';
+        try {
+          const errorData = await enrichResponse.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = `HTTP ${enrichResponse.status}: ${enrichResponse.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
-      const { data: enrichedMovies } = await enrichResponse.json();
+      let enrichedMovies;
+      try {
+        const responseData = await enrichResponse.json();
+        enrichedMovies = responseData.data;
+      } catch (e) {
+        throw new Error('Invalid response from movie enrichment. The response may be too large or incomplete.');
+      }
       console.log(`✅ Enriched ${enrichedMovies.length} movies`);
 
       // Step 3: Analyze movies with 62-dimension AI model
@@ -83,11 +107,23 @@ export default function Home() {
       });
 
       if (!analyzeResponse.ok) {
-        const errorData = await analyzeResponse.json();
-        throw new Error(errorData.error || 'Failed to analyze movies');
+        let errorMessage = 'Failed to analyze movies';
+        try {
+          const errorData = await analyzeResponse.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = `HTTP ${analyzeResponse.status}: ${analyzeResponse.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
-      const { data: analyzedMovies } = await analyzeResponse.json();
+      let analyzedMovies;
+      try {
+        const responseData = await analyzeResponse.json();
+        analyzedMovies = responseData.data;
+      } catch (e) {
+        throw new Error('Invalid response from AI analysis. The response may be too large or incomplete.');
+      }
       console.log(`✅ Analyzed ${analyzedMovies.length} movies with 62 dimensions`);
 
       // Step 4: Generate recommendations
@@ -105,11 +141,23 @@ export default function Home() {
       });
 
       if (!recsResponse.ok) {
-        const errorData = await recsResponse.json();
-        throw new Error(errorData.error || 'Failed to generate recommendations');
+        let errorMessage = 'Failed to generate recommendations';
+        try {
+          const errorData = await recsResponse.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = `HTTP ${recsResponse.status}: ${recsResponse.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
 
-      const { data: recsData } = await recsResponse.json();
+      let recsData;
+      try {
+        const responseData = await recsResponse.json();
+        recsData = responseData.data;
+      } catch (e) {
+        throw new Error('Invalid response from recommendation engine. The response may be too large or incomplete.');
+      }
       console.log(`✅ Generated ${recsData.recommendations.length} recommendations`);
 
       // Format data for display
