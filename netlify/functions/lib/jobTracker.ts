@@ -14,12 +14,31 @@ export interface JobStatus {
   updatedAt: string;
 }
 
+function getJobStore() {
+  // In Netlify Functions context, these are automatically provided
+  // But we need to explicitly pass them for Blobs to work
+  const siteID = process.env.NETLIFY_SITE_ID || '58b620ff-bd3c-44c0-8f6f-0ab0ce8f724d';
+  const token = process.env.NETLIFY_BLOBS_CONTEXT;
+  
+  if (token) {
+    // Use the automatic context token
+    return getStore({
+      name: 'jobs',
+      siteID,
+      token,
+    });
+  } else {
+    // Fallback to simple name (should work in deployed environment)
+    return getStore('jobs');
+  }
+}
+
 export function generateJobId(): string {
   return `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 export async function createJob(jobId: string, total: number): Promise<JobStatus> {
-  const store = getStore('jobs');
+  const store = getJobStore();
   const job: JobStatus = {
     jobId,
     status: 'pending',
@@ -36,7 +55,7 @@ export async function createJob(jobId: string, total: number): Promise<JobStatus
 
 export async function getJob(jobId: string): Promise<JobStatus | null> {
   try {
-    const store = getStore('jobs');
+    const store = getJobStore();
     const job = await store.get(jobId, { type: 'json' });
     return job as JobStatus | null;
   } catch (error) {
@@ -58,7 +77,7 @@ export async function updateJobProgress(
       job.progress.currentItem = currentItem;
     }
     job.updatedAt = new Date().toISOString();
-    const store = getStore('jobs');
+    const store = getJobStore();
     await store.setJSON(jobId, job);
   }
 }
@@ -70,7 +89,7 @@ export async function completeJob(jobId: string, result: any): Promise<void> {
     job.result = result;
     job.progress.current = job.progress.total;
     job.updatedAt = new Date().toISOString();
-    const store = getStore('jobs');
+    const store = getJobStore();
     await store.setJSON(jobId, job);
   }
 }
@@ -81,7 +100,7 @@ export async function failJob(jobId: string, error: string): Promise<void> {
     job.status = 'error';
     job.error = error;
     job.updatedAt = new Date().toISOString();
-    const store = getStore('jobs');
+    const store = getJobStore();
     await store.setJSON(jobId, job);
   }
 }
