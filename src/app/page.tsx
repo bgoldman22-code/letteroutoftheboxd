@@ -71,7 +71,7 @@ export default function Home() {
 
     } catch (err: any) {
       console.error('Error:', err);
-      setError(err.message || 'An error occurred');
+      setError(err.message || 'An error occurred. Note: API functionality is currently being migrated to work with Netlify serverless functions.');
     } finally {
       setLoading(false);
     }
@@ -118,6 +118,15 @@ export default function Home() {
               </button>
             </div>
             
+            {/* Status Note */}
+            <div className="mt-4 p-4 bg-blue-500/20 border border-blue-500/30 rounded-lg">
+              <p className="text-sm text-blue-200">
+                <strong>🚧 Development Status:</strong> Frontend successfully deployed to Netlify! 
+                API functionality is being rebuilt to work with serverless functions. 
+                The 62-dimension analysis engine runs locally.
+              </p>
+            </div>
+
             {error && (
               <div className="mt-4 p-4 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200">
                 ❌ {error}
