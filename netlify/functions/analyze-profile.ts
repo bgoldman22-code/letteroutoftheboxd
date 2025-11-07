@@ -22,10 +22,10 @@ async function scrapeLetterboxdProfile(username: string): Promise<ProfileData> {
   const baseUrl = `https://letterboxd.com/${username}`;
   
   try {
-    // Scrape profile page
+    // Scrape profile page for stats
     const profileResponse = await axios.get(baseUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
       },
     });
     
@@ -36,108 +36,68 @@ async function scrapeLetterboxdProfile(username: string): Promise<ProfileData> {
     const totalFilms = parseInt(stats.find('a[href$="/films/"] .value').text().replace(/,/g, '') || '0');
     const filmsThisYear = parseInt(stats.find('a[href$="/films/diary/this-year/"] .value').text().replace(/,/g, '') || '0');
     
-    // Scrape loved movies (films they gave heart to)
-    const lovedMovies: Movie[] = [];
-    const lovedResponse = await axios.get(`${baseUrl}/likes/films/`, {
+    // Use RSS feed to get rated movies (much more reliable!)
+    const rssUrl = `${baseUrl}/rss/`;
+    const rssResponse = await axios.get(rssUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
       },
     });
     
-    const $loved = cheerio.load(lovedResponse.data);
-    $loved('.poster-container').each((_, element) => {
-      const filmSlug = $loved(element).find('div').attr('data-film-slug') || '';
-      const filmName = $loved(element).find('img').attr('alt') || '';
+    const $rss = cheerio.load(rssResponse.data, { xmlMode: true });
+    
+    const allRatedMovies: Movie[] = [];
+    const lovedMovies: Movie[] = [];
+    const seenFilms = new Set<string>(); // Track unique films
+    
+    $rss('item').each((_, element) => {
+      const filmTitle = $rss(element).find('letterboxd\\:filmTitle, filmTitle').text();
+      const filmYear = $rss(element).find('letterboxd\\:filmYear, filmYear').text();
+      const memberRating = parseFloat($rss(element).find('letterboxd\\:memberRating, memberRating').text() || '0');
+      const link = $rss(element).find('link').text();
       
-      // Extract year from film name (usually in format "Title (Year)")
-      const yearMatch = filmName.match(/\((\d{4})\)/);
-      const year = yearMatch ? yearMatch[1] : '';
-      const title = filmName.replace(/\s*\(\d{4}\)$/, '');
-      
-      lovedMovies.push({
-        title,
-        year,
-        rating: 5, // Loved films are typically highly rated
-        letterboxd_url: `https://letterboxd.com/film/${filmSlug}/`,
-        loved: true,
-      });
+      if (filmTitle && filmYear && memberRating > 0) {
+        const filmId = `${filmTitle}_${filmYear}`;
+        
+        // Skip duplicates (rewatches)
+        if (seenFilms.has(filmId)) {
+          return;
+        }
+        seenFilms.add(filmId);
+        
+        const movie: Movie = {
+          title: filmTitle,
+          year: filmYear,
+          rating: memberRating,
+          letterboxd_url: link,
+        };
+        
+        allRatedMovies.push(movie);
+        
+        // Consider 5-star ratings as "loved"
+        if (memberRating === 5.0) {
+          lovedMovies.push({ ...movie, loved: true });
+        }
+      }
     });
     
-    // Scrape rated films (more comprehensive list)
-    const allRatedMovies: Movie[] = [];
-    let page = 1;
-    let hasMorePages = true;
-    
-    while (hasMorePages && page <= 5) { // Limit to 5 pages for performance
-      const ratedUrl = `${baseUrl}/films/ratings/page/${page}/`;
-      
-      try {
-        const ratedResponse = await axios.get(ratedUrl, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-          },
-        });
-        
-        const $rated = cheerio.load(ratedResponse.data);
-        const filmElements = $rated('.poster-container');
-        
-        if (filmElements.length === 0) {
-          hasMorePages = false;
-          break;
-        }
-        
-        $rated('.poster-container').each((_, element) => {
-          const filmSlug = $rated(element).find('div').attr('data-film-slug') || '';
-          const filmName = $rated(element).find('img').attr('alt') || '';
-          const ratingClass = $rated(element).find('.rating').attr('class') || '';
-          
-          // Extract rating from class (e.g., "rated-10" means 5 stars)
-          const ratingMatch = ratingClass.match(/rated-(\d+)/);
-          const ratingValue = ratingMatch ? parseInt(ratingMatch[1]) / 2 : 0;
-          
-          // Extract year
-          const yearMatch = filmName.match(/\((\d{4})\)/);
-          const year = yearMatch ? yearMatch[1] : '';
-          const title = filmName.replace(/\s*\(\d{4}\)$/, '');
-          
-          if (title && year) {
-            allRatedMovies.push({
-              title,
-              year,
-              rating: ratingValue,
-              letterboxd_url: `https://letterboxd.com/film/${filmSlug}/`,
-              loved: lovedMovies.some(m => m.title === title && m.year === year),
-            });
-          }
-        });
-        
-        page++;
-        
-        // Add delay to be respectful to Letterboxd servers
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-      } catch (error) {
-        console.log(`No more pages at page ${page}`);
-        hasMorePages = false;
-      }
-    }
+    console.log(`Scraped ${allRatedMovies.length} rated movies, ${lovedMovies.length} loved (5-star ratings)`);
     
     return {
       username,
       total_films: totalFilms,
       films_this_year: filmsThisYear,
-      loved_movies: lovedMovies.slice(0, 50), // Limit to top 50
-      all_rated_movies: allRatedMovies.slice(0, 200), // Limit to 200 for analysis
+      loved_movies: lovedMovies.slice(0, 50), // Limit to 50
+      all_rated_movies: allRatedMovies.slice(0, 200), // Limit to 200
     };
     
   } catch (error: any) {
-    console.error('Scraping error:', error.message);
+    console.error('Error scraping Letterboxd:', error.message);
     throw new Error(`Failed to scrape Letterboxd profile: ${error.message}`);
   }
 }
 
 export const handler: Handler = async (event) => {
-  // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -145,7 +105,6 @@ export const handler: Handler = async (event) => {
     'Content-Type': 'application/json',
   };
 
-  // Handle preflight
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
   }
@@ -169,10 +128,11 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    console.log(`🎬 Scraping profile for: ${username}`);
+    console.log(`🎬 Scraping Letterboxd profile for: ${username}`);
+
     const profileData = await scrapeLetterboxdProfile(username);
-    
-    console.log(`✅ Scraped ${profileData.all_rated_movies.length} rated movies, ${profileData.loved_movies.length} loved`);
+
+    console.log(`✅ Successfully scraped profile`);
 
     return {
       statusCode: 200,
@@ -190,7 +150,7 @@ export const handler: Handler = async (event) => {
       headers,
       body: JSON.stringify({
         success: false,
-        error: error.message || 'Failed to analyze profile',
+        error: error.message || 'Failed to scrape profile',
       }),
     };
   }
