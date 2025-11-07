@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import RecommendationMap from '@/components/RecommendationMap';
+// import RecommendationMap from '@/components/RecommendationMap';
 
 interface Movie {
   title: string;
@@ -174,13 +174,14 @@ export default function Home() {
             )}
 
             {/* Recommendation Visualization */}
-            {recommendations.recommendation_map && (
+            {/* Temporarily disabled for deployment */}
+            {/* {recommendations.recommendation_map && (
               <RecommendationMap 
                 movies={recommendations.recommendation_map.nodes || []}
                 connections={recommendations.recommendation_map.links || []}
                 centerMovie={username}
               />
-            )}
+            )} */}
 
             {/* Recommendation List */}
             <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl">
