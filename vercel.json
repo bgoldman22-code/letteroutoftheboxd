@@ -4,15 +4,6 @@
   "installCommand": "npm install && pip3 install -r requirements.txt",
   "framework": "nextjs",
   "outputDirectory": ".next",
-  "env": {
-    "OPENAI_API_KEY": "@openai_api_key",
-    "OMDB_API_KEY": "@omdb_api_key",
-    "WATCHMODE_API_KEY": "@watchmode_api_key",
-    "OPENAI_MODEL": "gpt-4o",
-    "OPENAI_EMBEDDING_MODEL": "text-embedding-3-large",
-    "NODE_ENV": "production",
-    "NEXT_PUBLIC_API_URL": "@next_public_api_url"
-  },
   "functions": {
     "api/**/*.py": {
       "runtime": "python3.9",
