@@ -100,7 +100,7 @@ export default function Home() {
       // Step 3: Analyze movies with 62-dimension AI model in batches
       console.log('🎬 Step 3/4: Analyzing with Elite 62-Dimension Model (processing in batches)...');
       const allAnalyzedMovies = [];
-      const batchSize = 8; // Process 8 movies per batch (fits in 26s timeout)
+      const batchSize = 10; // Process 10 movies per batch (fits in 26s timeout on paid plan)
       const totalBatches = Math.ceil(enrichedMovies.length / batchSize);
       
       for (let batch = 0; batch < totalBatches; batch++) {

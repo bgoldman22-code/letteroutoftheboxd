@@ -238,9 +238,8 @@ export const handler: Handler = async (event) => {
     // Analyze movies with delays to avoid rate limits
     const analyzedMovies = [];
     
-    // Process up to 8 movies to stay under 26-second Netlify timeout
-    // (8 movies × ~2.5s each = ~20 seconds + overhead)
-    const limit = Math.min(movies.length, 8);
+    // Process up to 10 movies per batch (paid plan: 26s timeout, ~2s per movie = 20s safe)
+    const limit = Math.min(movies.length, 10);
     
     for (let i = 0; i < limit; i++) {
       const movie = movies[i];
@@ -252,8 +251,8 @@ export const handler: Handler = async (event) => {
         });
         console.log(`✅ Analyzed: ${movie.title} (${i+1}/${limit})`);
         
-        // Small delay to respect rate limits
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Minimal delay to respect rate limits
+        await new Promise(resolve => setTimeout(resolve, 200));
       } catch (error: any) {
         console.error(`❌ Failed to analyze ${movie.title}:`, error.message);
         // Continue with other movies

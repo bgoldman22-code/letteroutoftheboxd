@@ -65,18 +65,21 @@ async function scrapeLetterboxdProfile(username: string): Promise<ProfileData> {
         }
         seenFilms.add(filmId);
         
-        const movie: Movie = {
-          title: filmTitle,
-          year: filmYear,
-          rating: memberRating,
-          letterboxd_url: link,
-        };
-        
-        allRatedMovies.push(movie);
-        
-        // Consider 5-star ratings as "loved"
-        if (memberRating === 5.0) {
-          lovedMovies.push({ ...movie, loved: true });
+        // ONLY include movies rated 3.5 stars (7/10) or higher - focus on what they LOVED
+        if (memberRating >= 3.5) {
+          const movie: Movie = {
+            title: filmTitle,
+            year: filmYear,
+            rating: memberRating,
+            letterboxd_url: link,
+          };
+          
+          allRatedMovies.push(movie);
+          
+          // Consider 5-star ratings as "loved"
+          if (memberRating === 5.0) {
+            lovedMovies.push({ ...movie, loved: true });
+          }
         }
       }
     });
