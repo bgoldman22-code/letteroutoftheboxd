@@ -21,6 +21,58 @@ interface RecommendationData {
   recommendation_map?: any;
 }
 
+interface JobStatus {
+  jobId: string;
+  status: 'pending' | 'processing' | 'completed' | 'error';
+  progress: {
+    current: number;
+    total: number;
+    currentItem?: string;
+  };
+  result?: any;
+  error?: string;
+}
+
+// Helper function to poll job status
+async function pollJobStatus(jobId: string, onProgress?: (status: JobStatus) => void): Promise<any> {
+  const maxAttempts = 300; // 5 minutes max (300 * 1s)
+  let attempts = 0;
+
+  while (attempts < maxAttempts) {
+    const response = await fetch(`/.netlify/functions/job-status?jobId=${jobId}`);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        // Job not found yet, wait a bit
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        attempts++;
+        continue;
+      }
+      throw new Error(`Failed to check job status: ${response.statusText}`);
+    }
+
+    const status: JobStatus = await response.json();
+
+    if (onProgress) {
+      onProgress(status);
+    }
+
+    if (status.status === 'completed') {
+      return status.result;
+    }
+
+    if (status.status === 'error') {
+      throw new Error(status.error || 'Job failed');
+    }
+
+    // Wait 1 second before polling again
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    attempts++;
+  }
+
+  throw new Error('Job timeout - processing took too long');
+}
+
 export default function Home() {
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
@@ -97,56 +149,41 @@ export default function Home() {
       }
       console.log(`✅ Enriched ${enrichedMovies.length} movies`);
 
-      // Step 3: Analyze movies with 62-dimension AI model in batches
-      console.log('🎬 Step 3/4: Analyzing with Elite 62-Dimension Model (processing in batches)...');
-      const allAnalyzedMovies = [];
-      const batchSize = 10; // Process 10 movies per batch (fits in 26s timeout on paid plan)
-      const totalBatches = Math.ceil(enrichedMovies.length / batchSize);
+      // Step 3: Analyze movies with 62-dimension AI model (async job with polling)
+      setLoadingStep(`Starting AI analysis for ${enrichedMovies.length} movies...`);
+      console.log('🎬 Step 3/4: Starting Elite 62-Dimension AI Analysis...');
       
-      for (let batch = 0; batch < totalBatches; batch++) {
-        const start = batch * batchSize;
-        const end = Math.min(start + batchSize, enrichedMovies.length);
-        const batchMovies = enrichedMovies.slice(start, end);
-        
-        setLoadingStep(`Analyzing movies ${start + 1}-${end} of ${enrichedMovies.length} (batch ${batch + 1}/${totalBatches})...`);
-        console.log(`📦 Batch ${batch + 1}/${totalBatches}: Analyzing movies ${start + 1}-${end}`);
-        
-        const analyzeResponse = await fetch('/.netlify/functions/analyze-movie', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ movies: batchMovies }),
-        });
+      const analyzeResponse = await fetch('/.netlify/functions/analyze-movie', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ movies: enrichedMovies }),
+      });
 
-        if (!analyzeResponse.ok) {
-          let errorMessage = 'Failed to analyze movies';
-          try {
-            const errorData = await analyzeResponse.json();
-            errorMessage = errorData.error || errorMessage;
-          } catch (e) {
-            errorMessage = `HTTP ${analyzeResponse.status}: ${analyzeResponse.statusText}`;
-          }
-          throw new Error(errorMessage);
-        }
-
-        let batchResult;
+      if (!analyzeResponse.ok) {
+        let errorMessage = 'Failed to start analysis';
         try {
-          const responseData = await analyzeResponse.json();
-          batchResult = responseData.data;
+          const errorData = await analyzeResponse.json();
+          errorMessage = errorData.error || errorMessage;
         } catch (e) {
-          throw new Error('Invalid response from AI analysis. The response may be too large or incomplete.');
+          errorMessage = `HTTP ${analyzeResponse.status}: ${analyzeResponse.statusText}`;
         }
-        
-        allAnalyzedMovies.push(...batchResult);
-        console.log(`✅ Batch ${batch + 1}/${totalBatches} complete: ${batchResult.length} movies analyzed`);
-        
-        // Small delay between batches to be respectful to APIs
-        if (batch < totalBatches - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+        throw new Error(errorMessage);
       }
+
+      const analyzeJobResponse = await analyzeResponse.json();
+      const analyzeJobId = analyzeJobResponse.jobId;
+      console.log(`📋 Analysis job started: ${analyzeJobId}`);
+
+      // Poll for analysis completion with progress updates
+      const analyzedMovies = await pollJobStatus(analyzeJobId, (status) => {
+        setLoadingStep(
+          `Analyzing movies: ${status.progress.current}/${status.progress.total}${
+            status.progress.currentItem ? ` - ${status.progress.currentItem}` : ''
+          }`
+        );
+      });
       
-      console.log(`✅ Analyzed ${allAnalyzedMovies.length} movies with 62 dimensions`);
-      const analyzedMovies = allAnalyzedMovies;
+      console.log(`✅ Analyzed ${analyzedMovies.length} movies with 62 dimensions`);
 
       // Step 4: Generate recommendations
       setLoadingStep('Generating personalized recommendations...');

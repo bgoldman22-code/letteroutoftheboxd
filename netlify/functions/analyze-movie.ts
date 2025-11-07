@@ -1,5 +1,12 @@
 import { Handler } from '@netlify/functions';
 import OpenAI from 'openai';
+import {
+  generateJobId,
+  createJob,
+  updateJobProgress,
+  completeJob,
+  failJob,
+} from './lib/jobTracker';
 
 interface EnrichedMovie {
   title: string;
@@ -231,45 +238,26 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    const openai = new OpenAI({ apiKey: openaiApiKey });
+    // Generate job ID and return immediately
+    const jobId = generateJobId();
+    await createJob(jobId, movies.length);
 
-    console.log(`🎬 Analyzing ${movies.length} movies with Elite 62-Dimension Model...`);
+    console.log(`🎬 Starting analysis job ${jobId} for ${movies.length} movies...`);
 
-    // Analyze movies with delays to avoid rate limits
-    const analyzedMovies = [];
-    
-    // Process up to 10 movies per batch (paid plan: 26s timeout, ~2s per movie = 20s safe)
-    const limit = Math.min(movies.length, 10);
-    
-    for (let i = 0; i < limit; i++) {
-      const movie = movies[i];
-      try {
-        const analysis = await analyzeMovieWithAI(movie, openai);
-        analyzedMovies.push({
-          ...movie,
-          elite_analysis: analysis,
-        });
-        console.log(`✅ Analyzed: ${movie.title} (${i+1}/${limit})`);
-        
-        // Minimal delay to respect rate limits
-        await new Promise(resolve => setTimeout(resolve, 200));
-      } catch (error: any) {
-        console.error(`❌ Failed to analyze ${movie.title}:`, error.message);
-        // Continue with other movies
-      }
-    }
+    // Start background processing (don't await - let it run)
+    processAnalysis(jobId, movies, openaiApiKey).catch((error) => {
+      console.error('Background analysis error:', error);
+      failJob(jobId, error.message);
+    });
 
-    console.log(`✅ Successfully analyzed ${analyzedMovies.length}/${movies.length} movies`);
-
+    // Return job ID immediately (202 Accepted)
     return {
-      statusCode: 200,
+      statusCode: 202,
       headers,
       body: JSON.stringify({
         success: true,
-        data: analyzedMovies,
-        processed: analyzedMovies.length,
-        total: movies.length,
-        has_more: movies.length > limit,
+        jobId,
+        message: `Analysis job started for ${movies.length} movies`,
       }),
     };
 
@@ -280,8 +268,42 @@ export const handler: Handler = async (event) => {
       headers,
       body: JSON.stringify({
         success: false,
-        error: error.message || 'Failed to analyze movies',
+        error: error.message || 'Failed to start analysis',
       }),
     };
   }
 };
+
+// Background processing function
+async function processAnalysis(
+  jobId: string,
+  movies: EnrichedMovie[],
+  openaiApiKey: string
+): Promise<void> {
+  const openai = new OpenAI({ apiKey: openaiApiKey });
+  const analyzedMovies = [];
+
+  for (let i = 0; i < movies.length; i++) {
+    const movie = movies[i];
+    
+    await updateJobProgress(jobId, i, `Analyzing ${movie.title} (${movie.year})`);
+
+    try {
+      const analysis = await analyzeMovieWithAI(movie, openai);
+      analyzedMovies.push({
+        ...movie,
+        elite_analysis: analysis,
+      });
+      console.log(`✅ Analyzed: ${movie.title} (${i+1}/${movies.length})`);
+
+      // Minimal delay to respect rate limits
+      await new Promise(resolve => setTimeout(resolve, 200));
+    } catch (error: any) {
+      console.error(`❌ Failed to analyze ${movie.title}:`, error.message);
+      // Continue with other movies even if one fails
+    }
+  }
+
+  console.log(`✅ Analysis job ${jobId} completed: ${analyzedMovies.length}/${movies.length} movies`);
+  await completeJob(jobId, analyzedMovies);
+}

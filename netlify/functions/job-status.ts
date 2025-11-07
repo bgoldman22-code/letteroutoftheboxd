@@ -1,5 +1,5 @@
 import { Handler } from '@netlify/functions';
-import { getJob, cleanupOldJobs } from './lib/jobTracker';
+import { getJob } from './lib/jobTracker';
 
 export const handler: Handler = async (event) => {
   const headers = {
@@ -25,11 +25,8 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    // Clean up old jobs periodically
-    cleanupOldJobs();
-
-    // Get job status
-    const job = getJob(jobId);
+    // Get job status from Netlify Blobs
+    const job = await getJob(jobId);
 
     if (!job) {
       return {
