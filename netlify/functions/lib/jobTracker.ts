@@ -15,36 +15,21 @@ export interface JobStatus {
 }
 
 function getJobStore() {
-  // Use explicit site ID and token from environment
-  const siteID = process.env.NETLIFY_SITE_ID || '58b620ff-bd3c-44c0-8f6f-0ab0ce8f724d';
-  // Use NETLIFY_FUNCTIONS_TOKEN (automatic, has correct permissions) instead of personal token
-  const token = process.env.NETLIFY_FUNCTIONS_TOKEN || process.env.NETLIFY_AUTH_TOKEN;
+  // Try simple store name first - Netlify automatically handles auth in function context
+  console.log('🔍 Creating Netlify Blobs store with automatic authentication...');
+  console.log('  - Running in Netlify Functions context');
+  console.log('  - Available NETLIFY vars:', Object.keys(process.env).filter(k => k.includes('NETLIFY')));
   
-  console.log('🔍 DEBUG - Netlify Blobs Config:');
-  console.log('  - NETLIFY_SITE_ID:', siteID ? `${siteID.substring(0, 8)}...` : 'MISSING');
-  console.log('  - Token type:', token === process.env.NETLIFY_FUNCTIONS_TOKEN ? 'NETLIFY_FUNCTIONS_TOKEN (automatic)' : 'NETLIFY_AUTH_TOKEN (personal)');
-  console.log('  - Token value:', token ? `${token.substring(0, 6)}... (length: ${token.length})` : 'MISSING');
-  console.log('  - All env vars available:', Object.keys(process.env).filter(k => k.includes('NETLIFY')));
-  
-  if (token) {
-    console.log('✅ Creating store with siteID and token');
-    try {
-      const store = getStore({
-        name: 'jobs',
-        siteID,
-        token,
-      });
-      console.log('✅ Store created successfully');
-      return store;
-    } catch (error: any) {
-      console.error('❌ Error creating store:', error.message);
-      throw error;
-    }
+  try {
+    // In Netlify Functions, getStore() automatically uses the correct context
+    const store = getStore('jobs');
+    console.log('✅ Store created successfully with automatic authentication');
+    return store;
+  } catch (error: any) {
+    console.error('❌ Error creating Netlify Blobs store:', error.message);
+    console.error('   This might mean Netlify Blobs is not enabled on this site.');
+    throw error;
   }
-  
-  // Fallback to simple name (shouldn't happen in production)
-  console.warn('⚠️  No token found, using default store config');
-  return getStore('jobs');
 }
 
 export function generateJobId(): string {

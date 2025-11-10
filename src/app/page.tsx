@@ -149,11 +149,12 @@ export default function Home() {
       }
       console.log(`✅ Enriched ${enrichedMovies.length} movies`);
 
-      // Step 3: Analyze movies with 62-dimension AI model (async job with polling)
-      setLoadingStep(`Starting AI analysis for ${enrichedMovies.length} movies...`);
+      // Step 3: Analyze movies with 62-dimension AI model (optimized synchronous)
+      setLoadingStep(`Analyzing ${enrichedMovies.length} movies with Elite 62-Dimension AI...`);
       console.log('🎬 Step 3/4: Starting Elite 62-Dimension AI Analysis...');
+      console.log('⚡ Using optimized parallel processing to analyze all movies in one go');
       
-      const analyzeResponse = await fetch('/.netlify/functions/analyze-movie', {
+      const analyzeResponse = await fetch('/.netlify/functions/analyze-movie-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ movies: enrichedMovies }),
@@ -170,20 +171,10 @@ export default function Home() {
         throw new Error(errorMessage);
       }
 
-      const analyzeJobResponse = await analyzeResponse.json();
-      const analyzeJobId = analyzeJobResponse.jobId;
-      console.log(`📋 Analysis job started: ${analyzeJobId}`);
-
-      // Poll for analysis completion with progress updates
-      const analyzedMovies = await pollJobStatus(analyzeJobId, (status) => {
-        setLoadingStep(
-          `Analyzing movies: ${status.progress.current}/${status.progress.total}${
-            status.progress.currentItem ? ` - ${status.progress.currentItem}` : ''
-          }`
-        );
-      });
+      const analyzeData = await analyzeResponse.json();
+      const analyzedMovies = analyzeData.analyzed;
       
-      console.log(`✅ Analyzed ${analyzedMovies.length} movies with 62 dimensions`);
+      console.log(`✅ Analyzed ${analyzeData.processed}/${analyzeData.total_movies} movies with 62 dimensions`);
 
       // Step 4: Generate recommendations
       setLoadingStep('Generating personalized recommendations...');
