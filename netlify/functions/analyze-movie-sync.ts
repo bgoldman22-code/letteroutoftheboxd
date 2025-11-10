@@ -148,12 +148,18 @@ const handler: Handler = async (event) => {
     const openai = new OpenAI({ apiKey: openaiApiKey });
     const analyzed: { [title: string]: AnalysisResult } = {};
     
-    // Process ALL movies with parallel requests to stay within timeout
-    // GPT-4o is fast enough to handle 30-40 movies in 20 seconds with parallel processing
+    // Process only first 15 movies to stay within 26s timeout
+    // This ensures reliable completion without 504 errors
+    const MAX_MOVIES = 15;
+    const moviesToProcess = movies.slice(0, MAX_MOVIES);
     const CONCURRENT_REQUESTS = 5; // Process 5 movies at a time
     
-    for (let i = 0; i < movies.length; i += CONCURRENT_REQUESTS) {
-      const batch = movies.slice(i, i + CONCURRENT_REQUESTS);
+    if (movies.length > MAX_MOVIES) {
+      console.log(`⚠️  Limiting analysis to ${MAX_MOVIES} movies (found ${movies.length}) to stay within timeout`);
+    }
+    
+    for (let i = 0; i < moviesToProcess.length; i += CONCURRENT_REQUESTS) {
+      const batch = moviesToProcess.slice(i, i + CONCURRENT_REQUESTS);
       
       await Promise.all(batch.map(async (movie) => {
         try {

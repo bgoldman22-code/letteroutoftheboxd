@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import SelectionRounds from '@/components/SelectionRounds';
 // import RecommendationMap from '@/components/RecommendationMap';
 
 interface Movie {
@@ -13,6 +14,12 @@ interface Movie {
   match_reasons?: string[];
   core_essence?: string;
   aesthetic_signature?: string;
+  director?: string;
+  genres?: string[];
+  poster?: string;
+  actors?: string[];
+  plot?: string;
+  runtime?: string;
 }
 
 interface RecommendationData {
@@ -79,6 +86,10 @@ export default function Home() {
   const [loadingStep, setLoadingStep] = useState('');
   const [error, setError] = useState('');
   const [recommendations, setRecommendations] = useState<RecommendationData | null>(null);
+  
+  // New states for selection flow
+  const [showSelectionRounds, setShowSelectionRounds] = useState(false);
+  const [enrichedMovies, setEnrichedMovies] = useState<Movie[]>([]);
 
   const handleAnalyze = async () => {
     if (!username.trim()) {
@@ -149,15 +160,32 @@ export default function Home() {
       }
       console.log(`✅ Enriched ${enrichedMovies.length} movies`);
 
-      // Step 3: Analyze movies with 62-dimension AI model (optimized synchronous)
-      setLoadingStep(`Analyzing ${enrichedMovies.length} movies with Elite 62-Dimension AI...`);
-      console.log('🎬 Step 3/4: Starting Elite 62-Dimension AI Analysis...');
-      console.log('⚡ Using optimized parallel processing to analyze all movies in one go');
+      // Step 3: Show interactive selection rounds
+      setEnrichedMovies(enrichedMovies);
+      setShowSelectionRounds(true);
+      setLoading(false);
+
+    } catch (err: any) {
+      console.error('Error:', err);
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  const handleSelectionComplete = async (selectedMovies: Movie[]) => {
+    setShowSelectionRounds(false);
+    setLoading(true);
+    setError('');
+
+    try {
+      // Step 3: Analyze the 9 selected movies with 62-dimension AI model
+      setLoadingStep(`Analyzing your 9 selected movies with Elite 62-Dimension AI...`);
+      console.log('🎬 Step 3/4: Starting Elite AI Analysis of selected movies...');
       
       const analyzeResponse = await fetch('/.netlify/functions/analyze-movie-sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ movies: enrichedMovies }),
+        body: JSON.stringify({ movies: selectedMovies }),
       });
 
       if (!analyzeResponse.ok) {
@@ -237,6 +265,20 @@ export default function Home() {
       setLoadingStep('');
     }
   };
+
+  // Show selection rounds interface
+  if (showSelectionRounds) {
+    return (
+      <SelectionRounds
+        movies={enrichedMovies}
+        onComplete={handleSelectionComplete}
+        onBack={() => {
+          setShowSelectionRounds(false);
+          setLoading(false);
+        }}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white">
