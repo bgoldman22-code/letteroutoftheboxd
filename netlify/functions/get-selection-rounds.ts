@@ -162,42 +162,21 @@ const handler: Handler = async (event) => {
       };
     }
 
-    // ROUND 2: Diverse from Round 1
-    if (round === 2) {
-      const excluded = getExcludedTitles(round1Shown);
-      const remainingPool = getRemainingPool(excluded);
-      
-      console.log(`🎬 Round 2: ${remainingPool.length} movies remaining after Round 1`);
-      
-      const round2 = selectDiverseMovies(remainingPool, round1Selections, 10);
-      
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({
-          round: 2,
-          movies: round2,
-          instruction: 'Pick 3 more from this diverse selection',
-        }),
-      };
-    }
-
-    // ROUND 3: Final round - maximum diversity
-    const excluded = getExcludedTitles(round1Shown, round2Shown);
+    // ROUND 2: Diverse from Round 1 - FINAL ROUND
+    const excluded = getExcludedTitles(round1Shown);
     const remainingPool = getRemainingPool(excluded);
     
-    console.log(`🎬 Round 3: ${remainingPool.length} movies remaining after Rounds 1 & 2`);
+    console.log(`🎬 Round 2 (FINAL): ${remainingPool.length} movies remaining after Round 1`);
     
-    const allPreviousSelections = [...round1Selections, ...round2Selections];
-    const round3 = selectEdgeCaseMovies(remainingPool, round1Selections, round2Selections, 10);
+    const round2 = selectDiverseMovies(remainingPool, round1Selections, 10);
     
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        round: 3,
-        movies: round3,
-        instruction: 'Final round - pick your last 3 to complete your taste profile!',
+        round: 2,
+        movies: round2,
+        instruction: 'Final round - pick 3 more to complete your 6-movie taste profile!',
       }),
     };
 

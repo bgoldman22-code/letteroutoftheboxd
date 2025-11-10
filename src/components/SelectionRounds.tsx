@@ -32,11 +32,13 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const TOTAL_ROUNDS = 3; // 3 rounds × 3 picks = 9 movies (reduced from 4 rounds for timeout)
+  const TOTAL_ROUNDS = 2; // 2 rounds × 3 picks = 6 movies (reduced from 3 for timeout - 33s > 26s limit)
 
   // Load round movies on mount and round changes
   useEffect(() => {
-    loadRound();
+    if (currentRound <= TOTAL_ROUNDS) {
+      loadRound();
+    }
   }, [currentRound]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function loadRound() {
@@ -106,16 +108,10 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
     if (currentRound === 1) {
       setRound1Selections(selected);
       setCurrentRound(2);
-      await loadRound();
-    } else if (currentRound === 2) {
-      setRound2Selections(selected);
-      setCurrentRound(3);
-      await loadRound();
     } else {
-      // Round 3 complete - return all 9 movies
+      // Round 2 complete - return all 6 movies
       const allSelected = [
         ...round1Selections,
-        ...round2Selections,
         ...selected
       ];
       onComplete(allSelected);
@@ -142,10 +138,10 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
           
           {/* Progress */}
           <div className="flex justify-center items-center gap-2 mb-4">
-            {[1, 2, 3].map(round => (
+            {[1, 2].map(round => (
               <div
                 key={round}
-                className={`w-20 h-2 rounded-full transition-all ${
+                className={`w-32 h-2 rounded-full transition-all ${
                   round < currentRound
                     ? 'bg-green-500'
                     : round === currentRound
