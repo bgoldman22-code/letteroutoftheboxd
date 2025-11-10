@@ -247,15 +247,44 @@ export default function Home() {
 
       console.log(`📊 Formatted ${analyzedMoviesArray.length} movies for recommendations`);
 
-        // Step 4a: Build smart exclusion list (user's movies + likely seen)
-        setLoadingStep('Building exclusion list...');
-        console.log('🎬 Step 4a/6: Building smart exclusion list...');
+        // Step 4a: Extract taste profile for AI and exclusions
+        setLoadingStep('Analyzing your taste profile...');
+        console.log('🎬 Step 4a/6: Extracting taste profile...');
+      
+        // Extract taste profile from analyzed movies
+        const tasteProfile = {
+          top_genres: Array.from(
+            new Set(analyzedMoviesArray.flatMap(m => m.genres || []))
+          ).slice(0, 5),
+          favorite_directors: Array.from(
+            new Set(analyzedMoviesArray.map(m => m.director).filter(Boolean))
+          ).slice(0, 5),
+          top_themes: Array.from(
+            new Set(analyzedMoviesArray.flatMap(m => 
+              m.elite_analysis?.human_condition_themes || []
+            ))
+          ).slice(0, 8),
+          preferred_decades: Array.from(
+            new Set(analyzedMoviesArray.map(m => {
+              const year = parseInt(m.year);
+              return year ? Math.floor(year / 10) * 10 + 's' : null;
+            }).filter(Boolean))
+          ),
+          avg_rating: analyzedMoviesArray.reduce((sum, m) => sum + (m.rating || 0), 0) / analyzedMoviesArray.length,
+        };
+
+        console.log(`🎯 Taste profile:`, tasteProfile);
+
+        // Step 4b: Build smart exclusion list (user's movies + likely seen)
+        setLoadingStep('Building smart exclusion list...');
+        console.log('🎬 Step 4b/6: Building smart exclusion list...');
       
         const exclusionResponse = await fetch('/.netlify/functions/build-exclusion-list', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             user_movies: analyzedMoviesArray,
+            taste_profile: tasteProfile,
           }),
         });
 
@@ -267,32 +296,9 @@ export default function Home() {
         const exclusions = exclusionData.data.exclusions;
         console.log(`✅ Built exclusion list: ${exclusions.length} movies to exclude`);
 
-        // Step 4b: Get AI recommendations from GPT
+        // Step 4c: Get AI recommendations from GPT
         setLoadingStep('AI discovering perfect movies for you...');
-        console.log('🎬 Step 4b/6: Fetching AI recommendations from GPT-4o-mini...');
-      
-        // Extract taste profile for GPT
-        const tasteProfile = {
-          favorite_genres: Array.from(
-            new Set(analyzedMoviesArray.flatMap(m => m.genres || []))
-          ).slice(0, 5),
-          favorite_directors: Array.from(
-            new Set(analyzedMoviesArray.map(m => m.director).filter(Boolean))
-          ).slice(0, 5),
-          themes: Array.from(
-            new Set(analyzedMoviesArray.flatMap(m => 
-              m.elite_analysis?.human_condition_themes || []
-            ))
-          ).slice(0, 8),
-          decades: Array.from(
-            new Set(analyzedMoviesArray.map(m => {
-              const year = parseInt(m.year);
-              return year ? Math.floor(year / 10) * 10 + 's' : null;
-            }).filter(Boolean))
-          ),
-        };
-
-        console.log(`🎯 Taste profile:`, tasteProfile);
+        console.log('🎬 Step 4c/6: Fetching AI recommendations from GPT-4o-mini...');
       
         const aiRecsResponse = await fetch('/.netlify/functions/fetch-ai-recommendations', {
           method: 'POST',
