@@ -103,22 +103,32 @@ export const handler: Handler = async (event) => {
       };
     }
 
-    console.log(`🎬 Enriching ${movies.length} movies...`);
+    console.log(`🎬 Enriching ${movies.length} movies with parallel processing...`);
 
-    // Enrich movies with delays to respect API rate limits
+    // Process up to 100 movies in parallel batches to stay within timeout
+    const moviesToProcess = movies.slice(0, Math.min(movies.length, 100));
+    
+    // Parallel processing with concurrency limit to respect API rate limits
+    const BATCH_SIZE = 10; // Process 10 movies at a time
     const enrichedMovies: EnrichedMovie[] = [];
     
-    // Process up to 100 movies to stay within timeout
-    for (let i = 0; i < Math.min(movies.length, 100); i++) {
-      const movie = movies[i];
-      const enriched = await enrichMovieWithOMDb(movie, omdbApiKey);
-      enrichedMovies.push(enriched);
+    for (let i = 0; i < moviesToProcess.length; i += BATCH_SIZE) {
+      const batch = moviesToProcess.slice(i, i + BATCH_SIZE);
+      console.log(`📦 Processing batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(moviesToProcess.length / BATCH_SIZE)}: ${batch.length} movies`);
       
-      // Small delay to respect API rate limits
-      await new Promise(resolve => setTimeout(resolve, 100));
+      const batchResults = await Promise.all(
+        batch.map(movie => enrichMovieWithOMDb(movie, omdbApiKey))
+      );
+      
+      enrichedMovies.push(...batchResults);
+      
+      // Small delay between batches to respect API rate limits
+      if (i + BATCH_SIZE < moviesToProcess.length) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
     }
 
-    console.log(`✅ Enriched ${enrichedMovies.length} movies`);
+    console.log(`✅ Enriched ${enrichedMovies.length} movies in parallel`);
 
     return {
       statusCode: 200,
