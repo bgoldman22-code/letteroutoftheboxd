@@ -22,17 +22,23 @@ interface SelectionRoundsProps {
 
 export default function SelectionRounds({ movies, onComplete, onBack }: SelectionRoundsProps) {
   const [currentRound, setCurrentRound] = useState(1);
+  const [currentPhase, setCurrentPhase] = useState<1 | 2>(1); // Phase 1: rounds 1-2, Phase 2: rounds 3-4
   const [roundMovies, setRoundMovies] = useState<Movie[]>([]);
   const [selectedInRound, setSelectedInRound] = useState<Set<string>>(new Set());
   const [round1Selections, setRound1Selections] = useState<Movie[]>([]);
   const [round2Selections, setRound2Selections] = useState<Movie[]>([]);
-  const [round1Shown, setRound1Shown] = useState<Movie[]>([]); // Track all Round 1 movies
-  const [round2Shown, setRound2Shown] = useState<Movie[]>([]); // Track all Round 2 movies
+  const [round3Selections, setRound3Selections] = useState<Movie[]>([]);
+  const [round1Shown, setRound1Shown] = useState<Movie[]>([]);
+  const [round2Shown, setRound2Shown] = useState<Movie[]>([]);
+  const [round3Shown, setRound3Shown] = useState<Movie[]>([]);
   const [instruction, setInstruction] = useState('');
   const [loading, setLoading] = useState(false);
+  const [analyzingPhase1, setAnalyzingPhase1] = useState(false);
   const [error, setError] = useState('');
+  const [tasteGaps, setTasteGaps] = useState<any>(null);
 
-  const TOTAL_ROUNDS = 3; // Reduced from 5 to work with ~30-50 movies from RSS
+  const ROUNDS_PER_PHASE = 2;
+  const TOTAL_ROUNDS = 4; // 2 phases × 2 rounds = 4 rounds total (12 movies)
 
   // Load round movies on mount and round changes
   useEffect(() => {
@@ -50,9 +56,15 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           movies,
+          phase: currentPhase,
+          round: currentRound,
           round1Selections,
           round2Selections,
-          round1Shown, // Pass shown movies to exclude from next rounds
+          round3Selections,
+          round1Shown,
+          round2Shown,
+          round3Shown,
+          tasteGaps, // Pass gaps from Phase 1 analysis to inform Phase 2 selection
         }),
       });
 
@@ -69,6 +81,8 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
         setRound1Shown(data.movies);
       } else if (currentRound === 2) {
         setRound2Shown(data.movies);
+      } else if (currentRound === 3) {
+        setRound3Shown(data.movies);
       }
     } catch (err: any) {
       setError(err.message);
@@ -102,18 +116,57 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
     const selected = getSelectedMovies();
 
     if (currentRound === 1) {
+      // Round 1 → Round 2 (still Phase 1)
       setRound1Selections(selected);
       setCurrentRound(2);
       await loadRound();
     } else if (currentRound === 2) {
+      // End of Phase 1 - analyze first 6 movies to find taste gaps
       setRound2Selections(selected);
-      setCurrentRound(3);
+      setAnalyzingPhase1(true);
+      
+      try {
+        const phase1Movies = [...round1Selections, ...selected];
+        console.log('🎬 Phase 1 complete: Analyzing 6 movies to find taste gaps...');
+        
+        // Analyze Phase 1 movies
+        const analyzeResponse = await fetch('/.netlify/functions/analyze-movie-sync', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ movies: phase1Movies }),
+        });
+
+        if (!analyzeResponse.ok) {
+          throw new Error('Failed to analyze Phase 1 movies');
+        }
+
+        const analyzeData = await analyzeResponse.json();
+        console.log('✅ Phase 1 analysis complete:', analyzeData);
+        
+        // Extract taste gaps for Phase 2 (simplified - backend will handle complexity)
+        setTasteGaps(analyzeData);
+        
+        // Move to Phase 2
+        setCurrentPhase(2);
+        setCurrentRound(3);
+        setAnalyzingPhase1(false);
+        await loadRound();
+        
+      } catch (err: any) {
+        setError(err.message);
+        setAnalyzingPhase1(false);
+      }
+    } else if (currentRound === 3) {
+      // Round 3 → Round 4 (Phase 2)
+      setRound3Selections(selected);
+      setCurrentRound(4);
       await loadRound();
     } else {
-      // Round 3 complete - combine all selections (9 movies total)
+      // Round 4 complete - return all 12 movies
       const allSelected = [
         ...round1Selections,
         ...round2Selections,
+        ...round3Selections,
         ...selected
       ];
       onComplete(allSelected);
@@ -121,6 +174,19 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
   }
 
   const canProceed = selectedInRound.size === 3;
+
+  // Show analyzing screen between Phase 1 and Phase 2
+  if (analyzingPhase1) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-8 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold text-white mb-2">Analyzing Your Taste...</h2>
+          <p className="text-gray-300">Discovering gaps in your cinematic profile to refine Phase 2 selections</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 p-8">
@@ -135,15 +201,15 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
           </button>
           
           <h1 className="text-4xl font-bold text-white mb-2">
-            Discover Your Cinematic Taste
+            {currentPhase === 1 ? 'Phase 1: Initial Taste Discovery' : 'Phase 2: Refining Your Profile'}
           </h1>
           
           {/* Progress */}
           <div className="flex justify-center items-center gap-2 mb-4">
-            {[1, 2, 3].map(round => (
+            {[1, 2, 3, 4].map(round => (
               <div
                 key={round}
-                className={`w-16 h-2 rounded-full transition-all ${
+                className={`w-12 h-2 rounded-full transition-all ${
                   round < currentRound
                     ? 'bg-green-500'
                     : round === currentRound
@@ -156,6 +222,7 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
           
           <p className="text-xl text-purple-200">
             Round {currentRound} of {TOTAL_ROUNDS}
+            {currentPhase === 2 && ' • Filling taste gaps'}
           </p>
           
           <p className="text-lg text-gray-300 mt-2">

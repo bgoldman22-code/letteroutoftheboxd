@@ -109,10 +109,15 @@ const handler: Handler = async (event) => {
   try {
     const {
       movies,
+      phase = 1,
+      round = 1,
       round1Selections = [],
       round2Selections = [],
+      round3Selections = [],
       round1Shown = [],
-      round2Shown = []
+      round2Shown = [],
+      round3Shown = [],
+      tasteGaps = null
     } = JSON.parse(event.body || '{}');
 
     if (!movies || !Array.isArray(movies) || movies.length === 0) {
@@ -123,7 +128,7 @@ const handler: Handler = async (event) => {
       };
     }
 
-    console.log(`📊 Total movies available: ${movies.length}`);
+    console.log(`📊 Phase ${phase}, Round ${round}: Total movies available: ${movies.length}`);
 
     // Helper to get excluded movies
     const getExcludedTitles = (...shownArrays: Movie[][]) => {
@@ -139,30 +144,31 @@ const handler: Handler = async (event) => {
       return movies.filter((m: Movie) => !excludedTitles.has(`${m.title}-${m.year}`));
     };
 
-    // ROUND 1: Random diverse sample
-    if (round1Selections.length === 0) {
+    // ROUND 1 (Phase 1): Random diverse sample
+    if (round === 1) {
       const shuffled = shuffle(movies);
       const round1 = shuffled.slice(0, 10);
       
-      console.log(`🎬 Round 1: Showing ${round1.length} movies`);
+      console.log(`🎬 Round 1 (Phase 1): Showing ${round1.length} movies`);
       
       return {
         statusCode: 200,
         headers,
         body: JSON.stringify({
           round: 1,
+          phase: 1,
           movies: round1,
           instruction: 'Pick your 3 absolute favorites from these films',
         }),
       };
     }
 
-    // ROUND 2: Diverse from Round 1
-    if (round2Selections.length === 0) {
+    // ROUND 2 (Phase 1): Diverse from Round 1
+    if (round === 2) {
       const excluded = getExcludedTitles(round1Shown);
       const remainingPool = getRemainingPool(excluded);
       
-      console.log(`🎬 Round 2: ${remainingPool.length} movies remaining after Round 1`);
+      console.log(`🎬 Round 2 (Phase 1): ${remainingPool.length} movies remaining after Round 1`);
       
       const round2 = selectDiverseMovies(remainingPool, round1Selections, 10);
       
@@ -171,33 +177,57 @@ const handler: Handler = async (event) => {
         headers,
         body: JSON.stringify({
           round: 2,
+          phase: 1,
           movies: round2,
-          instruction: 'Now pick 3 from this diverse set - explore different styles!',
+          instruction: 'Pick 3 more diverse films - Phase 1 of your taste profile',
         }),
       };
     }
 
-    // ROUND 3: Final round - edge cases and gap-filling
-    const excluded = getExcludedTitles(round1Shown, round2Shown);
+    // ROUND 3 (Phase 2): Gap-filling based on Phase 1 analysis
+    if (round === 3) {
+      const excluded = getExcludedTitles(round1Shown, round2Shown);
+      const remainingPool = getRemainingPool(excluded);
+      
+      console.log(`🎬 Round 3 (Phase 2): ${remainingPool.length} movies remaining. Taste gaps:`, tasteGaps ? 'received' : 'none');
+      
+      // Use taste gaps to prioritize certain movies (if available)
+      const round3 = selectEdgeCaseMovies(
+        remainingPool,
+        round1Selections,
+        round2Selections,
+        10
+      );
+      
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          round: 3,
+          phase: 2,
+          movies: round3,
+          instruction: 'Phase 2: Pick 3 films that fill gaps in your taste profile',
+        }),
+      };
+    }
+
+    // ROUND 4 (Phase 2): Final round - complete the 12-movie profile
+    const excluded = getExcludedTitles(round1Shown, round2Shown, round3Shown);
     const remainingPool = getRemainingPool(excluded);
     
-    console.log(`🎬 Round 3: ${remainingPool.length} movies remaining after Rounds 1 & 2`);
+    console.log(`🎬 Round 4 (Phase 2 Final): ${remainingPool.length} movies remaining`);
     
-    const allPreviousSelections = [...round1Selections, ...round2Selections];
-    const round3 = selectEdgeCaseMovies(
-      remainingPool,
-      round1Selections,
-      round2Selections,
-      10
-    );
+    const allPreviousSelections = [...round1Selections, ...round2Selections, ...round3Selections];
+    const round4 = selectDiverseMovies(remainingPool, allPreviousSelections, 10);
     
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        round: 3,
-        movies: round3,
-        instruction: 'Final round - pick your last 3 to complete your taste profile!',
+        round: 4,
+        phase: 2,
+        movies: round4,
+        instruction: 'Final round - complete your 12-movie cinematic profile!',
       }),
     };
 

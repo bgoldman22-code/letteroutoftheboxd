@@ -152,7 +152,7 @@ const handler: Handler = async (event) => {
     // This ensures reliable completion without 504 errors
     const MAX_MOVIES = 15;
     const moviesToProcess = movies.slice(0, MAX_MOVIES);
-    const CONCURRENT_REQUESTS = 5; // Process 5 movies at a time
+    const CONCURRENT_REQUESTS = 3; // Reduced to 3 for more reliable completion (was 5)
     
     if (movies.length > MAX_MOVIES) {
       console.log(`⚠️  Limiting analysis to ${MAX_MOVIES} movies (found ${movies.length}) to stay within timeout`);
@@ -175,7 +175,7 @@ Runtime: ${movie.runtime || 'Unknown'}
           console.log(`  📽️  Analyzing: ${movie.title} (${movie.year})`);
 
           const completion = await openai.chat.completions.create({
-            model: 'gpt-4o',
+            model: 'gpt-4o-mini', // Using mini for 10x faster response + 60x cheaper
             messages: [
               {
                 role: 'system',
@@ -187,7 +187,7 @@ Runtime: ${movie.runtime || 'Unknown'}
               },
             ],
             temperature: 0.7,
-            max_tokens: 1500, // Reduced for faster responses
+            max_tokens: 1000, // Reduced for faster responses (was 1500)
           });
 
           const responseText = completion.choices[0]?.message?.content?.trim() || '{}';
