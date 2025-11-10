@@ -247,17 +247,44 @@ export default function Home() {
 
       console.log(`📊 Formatted ${analyzedMoviesArray.length} movies for recommendations`);
 
-      // Step 4: Generate recommendations using simple metadata-based matching
-      setLoadingStep('Generating personalized recommendations...');
-      console.log('🎬 Step 4/4: Generating personalized recommendations...');
-      console.log(`📊 Using ${enrichedMovies.length} enriched movies as candidate pool`);
+        // Step 4: Fetch TMDb candidates (movies user HASN'T seen)
+        setLoadingStep('Discovering new movies for you...');
+        console.log('🎬 Step 4/5: Fetching external movie candidates from TMDb...');
+      
+        // Extract favorite genres from analyzed movies for TMDb search
+        const favoriteGenres = Array.from(
+          new Set(analyzedMoviesArray.flatMap(m => m.genres || []))
+        ).slice(0, 3);
+      
+        console.log(`🎯 User's favorite genres: ${favoriteGenres.join(', ')}`);
+      
+        const tmdbResponse = await fetch('/.netlify/functions/fetch-tmdb-candidates', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            favorite_genres: favoriteGenres,
+            user_movies: analyzedMoviesArray, // To filter out movies user has already seen
+          }),
+        });
+
+        if (!tmdbResponse.ok) {
+          throw new Error('Failed to fetch candidate movies from TMDb');
+        }
+
+        const tmdbData = await tmdbResponse.json();
+        const externalCandidates = tmdbData.data;
+        console.log(`✅ Fetched ${externalCandidates.length} external candidates from TMDb`);
+
+        // Step 5: Generate recommendations from EXTERNAL candidates
+        setLoadingStep('Generating personalized recommendations...');
+        console.log('🎬 Step 5/5: Generating personalized recommendations from external movies...');
       
       const recsResponse = await fetch('/.netlify/functions/get-simple-recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_movies: analyzedMoviesArray,
-          candidate_movies: enrichedMovies, // Use the full enriched pool from user's profile
+            candidate_movies: externalCandidates, // Use EXTERNAL movies from TMDb, not user's own profile!
         }),
       });
 
