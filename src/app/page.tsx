@@ -179,8 +179,8 @@ export default function Home() {
     setError('');
 
     try {
-      // Step 3: Analyze the 12 selected movies with 62-dimension AI model
-      setLoadingStep(`Analyzing your 12 selected movies with Elite 62-Dimension AI...`);
+      // Step 3: Analyze the 9 selected movies with 62-dimension AI model
+      setLoadingStep(`Analyzing your 9 selected movies with Elite 62-Dimension AI...`);
       console.log('🎬 Step 3/4: Starting Elite AI Analysis of selected movies...');
       console.log(`📊 Processing ${selectedMovies.length} strategically-selected movies`);
       

@@ -22,21 +22,17 @@ interface SelectionRoundsProps {
 
 export default function SelectionRounds({ movies, onComplete, onBack }: SelectionRoundsProps) {
   const [currentRound, setCurrentRound] = useState(1);
-  const [currentPhase, setCurrentPhase] = useState<1 | 2>(1); // Phase 1: rounds 1-2, Phase 2: rounds 3-4
   const [roundMovies, setRoundMovies] = useState<Movie[]>([]);
   const [selectedInRound, setSelectedInRound] = useState<Set<string>>(new Set());
   const [round1Selections, setRound1Selections] = useState<Movie[]>([]);
   const [round2Selections, setRound2Selections] = useState<Movie[]>([]);
-  const [round3Selections, setRound3Selections] = useState<Movie[]>([]);
   const [round1Shown, setRound1Shown] = useState<Movie[]>([]);
   const [round2Shown, setRound2Shown] = useState<Movie[]>([]);
-  const [round3Shown, setRound3Shown] = useState<Movie[]>([]);
   const [instruction, setInstruction] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const ROUNDS_PER_PHASE = 2;
-  const TOTAL_ROUNDS = 4; // 2 phases × 2 rounds = 4 rounds total (12 movies)
+  const TOTAL_ROUNDS = 3; // 3 rounds × 3 picks = 9 movies (reduced from 4 rounds for timeout)
 
   // Load round movies on mount and round changes
   useEffect(() => {
@@ -54,14 +50,11 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           movies,
-          phase: currentPhase,
           round: currentRound,
           round1Selections,
           round2Selections,
-          round3Selections,
           round1Shown,
           round2Shown,
-          round3Shown,
         }),
       });
 
@@ -78,8 +71,6 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
         setRound1Shown(data.movies);
       } else if (currentRound === 2) {
         setRound2Shown(data.movies);
-      } else if (currentRound === 3) {
-        setRound3Shown(data.movies);
       }
     } catch (err: any) {
       setError(err.message);
@@ -113,31 +104,18 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
     const selected = getSelectedMovies();
 
     if (currentRound === 1) {
-      // Round 1 → Round 2 (still Phase 1)
       setRound1Selections(selected);
       setCurrentRound(2);
       await loadRound();
     } else if (currentRound === 2) {
-      // End of Phase 1 - move directly to Phase 2 with strategic diversity
       setRound2Selections(selected);
-      
-      console.log('🎬 Phase 1 complete: Moving to Phase 2 for strategic diversity...');
-      
-      // Move to Phase 2 (no intermediate analysis needed)
-      setCurrentPhase(2);
       setCurrentRound(3);
       await loadRound();
-    } else if (currentRound === 3) {
-      // Round 3 → Round 4 (Phase 2)
-      setRound3Selections(selected);
-      setCurrentRound(4);
-      await loadRound();
     } else {
-      // Round 4 complete - return all 12 movies
+      // Round 3 complete - return all 9 movies
       const allSelected = [
         ...round1Selections,
         ...round2Selections,
-        ...round3Selections,
         ...selected
       ];
       onComplete(allSelected);
@@ -159,15 +137,15 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
           </button>
           
           <h1 className="text-4xl font-bold text-white mb-2">
-            {currentPhase === 1 ? 'Phase 1: Initial Taste Discovery' : 'Phase 2: Exploring Your Range'}
+            Discover Your Cinematic Taste
           </h1>
           
           {/* Progress */}
           <div className="flex justify-center items-center gap-2 mb-4">
-            {[1, 2, 3, 4].map(round => (
+            {[1, 2, 3].map(round => (
               <div
                 key={round}
-                className={`w-12 h-2 rounded-full transition-all ${
+                className={`w-20 h-2 rounded-full transition-all ${
                   round < currentRound
                     ? 'bg-green-500'
                     : round === currentRound
@@ -180,7 +158,6 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
           
           <p className="text-xl text-purple-200">
             Round {currentRound} of {TOTAL_ROUNDS}
-            {currentPhase === 2 && ' • Expanding your cinematic range'}
           </p>
           
           <p className="text-lg text-gray-300 mt-2">
