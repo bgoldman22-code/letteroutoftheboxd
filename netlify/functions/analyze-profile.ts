@@ -38,65 +38,86 @@ async function scrapeLetterboxdProfile(username: string): Promise<ProfileData> {
     
     console.log(`📊 Profile stats: ${totalFilms} total films, ${filmsThisYear} this year`);
     
-    // Use RSS feed to get rated movies (much more reliable!)
-    // RSS typically returns the most recent 50-100 entries
-    const rssUrl = `${baseUrl}/rss/`;
-    console.log(`� Fetching RSS feed: ${rssUrl}`);
+    // MULTI-SOURCE SCRAPING: Get diverse sample across time periods and ratings
+    // This gives us 150-200 movies instead of just 34 recent ones
+    const rssFeeds = [
+      { name: 'Recent Activity', url: `${baseUrl}/rss/`, minRating: 3.5 },
+      { name: '5-Star Films', url: `${baseUrl}/films/rated/5/rss/`, minRating: 5.0 },
+      { name: '4.5-Star Films', url: `${baseUrl}/films/rated/4.5/rss/`, minRating: 4.5 },
+      { name: '2020s Films', url: `${baseUrl}/films/decade/2020s/rss/`, minRating: 3.5 },
+      { name: '2010s Films', url: `${baseUrl}/films/decade/2010s/rss/`, minRating: 3.5 },
+      { name: '2000s Films', url: `${baseUrl}/films/decade/2000s/rss/`, minRating: 3.5 },
+    ];
     
-    const rssResponse = await axios.get(rssUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-      },
-    });
-    
-    const $rss = cheerio.load(rssResponse.data, { xmlMode: true });
-    
-    const allRatedMovies: Movie[] = [];
+    const seenFilms = new Map<string, Movie>(); // Use Map to deduplicate by filmId
     const lovedMovies: Movie[] = [];
-    const seenFilms = new Set<string>(); // Track unique films
     
-    $rss('item').each((_, element) => {
-      const filmTitle = $rss(element).find('letterboxd\\:filmTitle, filmTitle').text();
-      const filmYear = $rss(element).find('letterboxd\\:filmYear, filmYear').text();
-      const memberRating = parseFloat($rss(element).find('letterboxd\\:memberRating, memberRating').text() || '0');
-      const link = $rss(element).find('link').text();
-      
-      if (filmTitle && filmYear && memberRating > 0) {
-        const filmId = `${filmTitle}_${filmYear}`;
+    for (const feed of rssFeeds) {
+      try {
+        console.log(`📡 Fetching ${feed.name}: ${feed.url}`);
         
-        // Skip duplicates (rewatches)
-        if (seenFilms.has(filmId)) {
-          return;
-        }
-        seenFilms.add(filmId);
+        const rssResponse = await axios.get(feed.url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+          },
+          timeout: 10000,
+        });
         
-        // ONLY include movies rated 3.5 stars (7/10) or higher - focus on what they LOVED
-        if (memberRating >= 3.5) {
-          const movie: Movie = {
-            title: filmTitle,
-            year: filmYear,
-            rating: memberRating,
-            letterboxd_url: link,
-          };
+        const $rss = cheerio.load(rssResponse.data, { xmlMode: true });
+        let feedCount = 0;
+        
+        $rss('item').each((_, element) => {
+          const filmTitle = $rss(element).find('letterboxd\\:filmTitle, filmTitle').text();
+          const filmYear = $rss(element).find('letterboxd\\:filmYear, filmYear').text();
+          const memberRating = parseFloat($rss(element).find('letterboxd\\:memberRating, memberRating').text() || '0');
+          const link = $rss(element).find('link').text();
           
-          allRatedMovies.push(movie);
-          
-          // Consider 5-star ratings as "loved"
-          if (memberRating === 5.0) {
-            lovedMovies.push({ ...movie, loved: true });
+          if (filmTitle && filmYear && memberRating > 0) {
+            const filmId = `${filmTitle}_${filmYear}`;
+            
+            // Only add if meets minimum rating and not already seen
+            if (memberRating >= feed.minRating && !seenFilms.has(filmId)) {
+              const movie: Movie = {
+                title: filmTitle,
+                year: filmYear,
+                rating: memberRating,
+                letterboxd_url: link,
+              };
+              
+              seenFilms.set(filmId, movie);
+              feedCount++;
+              
+              // Track 5-star ratings as "loved"
+              if (memberRating === 5.0) {
+                lovedMovies.push({ ...movie, loved: true });
+              }
+            }
           }
-        }
+        });
+        
+        console.log(`   ✅ ${feed.name}: +${feedCount} unique films`);
+        
+        // Small delay between requests to be polite
+        await new Promise(resolve => setTimeout(resolve, 250));
+        
+      } catch (error) {
+        console.error(`   ❌ ${feed.name} failed:`, error instanceof Error ? error.message : 'Unknown error');
+        // Continue with other feeds even if one fails
       }
-    });
+    }
     
-    console.log(`✅ RSS feed scraped: ${allRatedMovies.length} rated movies (3.5+ stars), ${lovedMovies.length} loved (5 stars)`);
+    // Convert Map to sorted array (highest rated first)
+    const allRatedMovies = Array.from(seenFilms.values()).sort((a, b) => b.rating - a.rating);
+    
+    console.log(`\n🎬 TOTAL SCRAPED: ${allRatedMovies.length} unique films (${lovedMovies.length} loved)`);
+
     
     return {
       username,
       total_films: totalFilms,
       films_this_year: filmsThisYear,
       loved_movies: lovedMovies,
-      all_rated_movies: allRatedMovies, // Return all movies from RSS
+      all_rated_movies: allRatedMovies,
     };
     
   } catch (error: any) {

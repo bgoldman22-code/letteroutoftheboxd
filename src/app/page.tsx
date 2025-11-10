@@ -247,44 +247,100 @@ export default function Home() {
 
       console.log(`📊 Formatted ${analyzedMoviesArray.length} movies for recommendations`);
 
-        // Step 4: Fetch TMDb candidates (movies user HASN'T seen)
-        setLoadingStep('Discovering new movies for you...');
-        console.log('🎬 Step 4/5: Fetching external movie candidates from TMDb...');
+        // Step 4a: Build smart exclusion list (user's movies + likely seen)
+        setLoadingStep('Building exclusion list...');
+        console.log('🎬 Step 4a/6: Building smart exclusion list...');
       
-        // Extract favorite genres from analyzed movies for TMDb search
-        const favoriteGenres = Array.from(
-          new Set(analyzedMoviesArray.flatMap(m => m.genres || []))
-        ).slice(0, 3);
-      
-        console.log(`🎯 User's favorite genres: ${favoriteGenres.join(', ')}`);
-      
-        const tmdbResponse = await fetch('/.netlify/functions/fetch-tmdb-candidates', {
+        const exclusionResponse = await fetch('/.netlify/functions/build-exclusion-list', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            favorite_genres: favoriteGenres,
-            user_movies: analyzedMoviesArray, // To filter out movies user has already seen
+            user_movies: analyzedMoviesArray,
           }),
         });
 
-        if (!tmdbResponse.ok) {
-          throw new Error('Failed to fetch candidate movies from TMDb');
+        if (!exclusionResponse.ok) {
+          throw new Error('Failed to build exclusion list');
         }
 
-        const tmdbData = await tmdbResponse.json();
-        const externalCandidates = tmdbData.data;
-        console.log(`✅ Fetched ${externalCandidates.length} external candidates from TMDb`);
+        const exclusionData = await exclusionResponse.json();
+        const exclusions = exclusionData.data.exclusions;
+        console.log(`✅ Built exclusion list: ${exclusions.length} movies to exclude`);
 
-        // Step 5: Generate recommendations from EXTERNAL candidates
+        // Step 4b: Get AI recommendations from GPT
+        setLoadingStep('AI discovering perfect movies for you...');
+        console.log('🎬 Step 4b/6: Fetching AI recommendations from GPT-4o-mini...');
+      
+        // Extract taste profile for GPT
+        const tasteProfile = {
+          favorite_genres: Array.from(
+            new Set(analyzedMoviesArray.flatMap(m => m.genres || []))
+          ).slice(0, 5),
+          favorite_directors: Array.from(
+            new Set(analyzedMoviesArray.map(m => m.director).filter(Boolean))
+          ).slice(0, 5),
+          themes: Array.from(
+            new Set(analyzedMoviesArray.flatMap(m => 
+              m.elite_analysis?.human_condition_themes || []
+            ))
+          ).slice(0, 8),
+          decades: Array.from(
+            new Set(analyzedMoviesArray.map(m => {
+              const year = parseInt(m.year);
+              return year ? Math.floor(year / 10) * 10 + 's' : null;
+            }).filter(Boolean))
+          ),
+        };
+
+        console.log(`🎯 Taste profile:`, tasteProfile);
+      
+        const aiRecsResponse = await fetch('/.netlify/functions/fetch-ai-recommendations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            taste_profile: tasteProfile,
+            exclusions: exclusions,
+          }),
+        });
+
+        if (!aiRecsResponse.ok) {
+          throw new Error('Failed to fetch AI recommendations');
+        }
+
+        const aiRecsData = await aiRecsResponse.json();
+        const aiRecommendations = aiRecsData.data.recommendations;
+        console.log(`✅ GPT recommended ${aiRecommendations.length} movies`);
+
+        // Step 4c: Enrich AI recommendations with OMDb metadata (batch of 30)
+        setLoadingStep('Enriching recommendations with metadata...');
+        console.log('🎬 Step 4c/6: Enriching AI recommendations with OMDb...');
+      
+        const enrichBatch = aiRecommendations.slice(0, 30); // Enrich first 30
+      
+        const enrichAIResponse = await fetch('/.netlify/functions/enrich-movies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ movies: enrichBatch }),
+        });
+
+        if (!enrichAIResponse.ok) {
+          throw new Error('Failed to enrich AI recommendations');
+        }
+
+        const enrichAIData = await enrichAIResponse.json();
+        const enrichedAICandidates = enrichAIData.data.enriched_movies;
+        console.log(`✅ Enriched ${enrichedAICandidates.length} AI recommendations`);
+
+        // Step 5: Generate final recommendations from enriched AI candidates
         setLoadingStep('Generating personalized recommendations...');
-        console.log('🎬 Step 5/5: Generating personalized recommendations from external movies...');
+        console.log('🎬 Step 5/6: Matching AI recommendations to your taste...');
       
       const recsResponse = await fetch('/.netlify/functions/get-simple-recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_movies: analyzedMoviesArray,
-            candidate_movies: externalCandidates, // Use EXTERNAL movies from TMDb, not user's own profile!
+            candidate_movies: enrichedAICandidates, // Use AI-recommended + enriched movies!
         }),
       });
 
