@@ -152,7 +152,7 @@ const handler: Handler = async (event) => {
     // This ensures reliable completion without 504 errors
     const MAX_MOVIES = 15;
     const moviesToProcess = movies.slice(0, MAX_MOVIES);
-    const CONCURRENT_REQUESTS = 3; // Reduced to 3 for more reliable completion (was 5)
+    const CONCURRENT_REQUESTS = 6; // Analyze all 6 movies at once for Phase 1 speed (was 3)
     
     if (movies.length > MAX_MOVIES) {
       console.log(`⚠️  Limiting analysis to ${MAX_MOVIES} movies (found ${movies.length}) to stay within timeout`);
@@ -186,8 +186,8 @@ Runtime: ${movie.runtime || 'Unknown'}
                 content: ELITE_ANALYSIS_PROMPT_TEMPLATE.replace('{FILM_DATA}', filmData),
               },
             ],
-            temperature: 0.7,
-            max_tokens: 1000, // Reduced for faster responses (was 1500)
+            temperature: 0.5, // Reduced from 0.7 for faster, more focused generation
+            max_tokens: 800, // Reduced from 1000 for speed
           });
 
           const responseText = completion.choices[0]?.message?.content?.trim() || '{}';

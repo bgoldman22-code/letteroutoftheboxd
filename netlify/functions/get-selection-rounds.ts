@@ -116,8 +116,7 @@ const handler: Handler = async (event) => {
       round3Selections = [],
       round1Shown = [],
       round2Shown = [],
-      round3Shown = [],
-      tasteGaps = null
+      round3Shown = []
     } = JSON.parse(event.body || '{}');
 
     if (!movies || !Array.isArray(movies) || movies.length === 0) {
@@ -189,9 +188,9 @@ const handler: Handler = async (event) => {
       const excluded = getExcludedTitles(round1Shown, round2Shown);
       const remainingPool = getRemainingPool(excluded);
       
-      console.log(`🎬 Round 3 (Phase 2): ${remainingPool.length} movies remaining. Taste gaps:`, tasteGaps ? 'received' : 'none');
+      console.log(`🎬 Round 3 (Phase 2): ${remainingPool.length} movies remaining for strategic diversity`);
       
-      // Use taste gaps to prioritize certain movies (if available)
+      // Use edge case selection for maximum diversity from Phase 1
       const round3 = selectEdgeCaseMovies(
         remainingPool,
         round1Selections,
@@ -206,7 +205,7 @@ const handler: Handler = async (event) => {
           round: 3,
           phase: 2,
           movies: round3,
-          instruction: 'Phase 2: Pick 3 films that fill gaps in your taste profile',
+          instruction: 'Phase 2: Pick 3 films from a different stylistic range',
         }),
       };
     }
@@ -227,7 +226,7 @@ const handler: Handler = async (event) => {
         round: 4,
         phase: 2,
         movies: round4,
-        instruction: 'Final round - complete your 12-movie cinematic profile!',
+        instruction: 'Final round - complete your 12-movie taste profile!',
       }),
     };
 
