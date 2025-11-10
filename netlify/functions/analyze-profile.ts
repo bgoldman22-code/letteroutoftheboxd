@@ -38,15 +38,13 @@ async function scrapeLetterboxdProfile(username: string): Promise<ProfileData> {
     
     console.log(`📊 Profile stats: ${totalFilms} total films, ${filmsThisYear} this year`);
     
-    // MULTI-SOURCE SCRAPING: Get diverse sample across time periods and ratings
-    // This gives us 150-200 movies instead of just 34 recent ones
+    // SIMPLIFIED MULTI-SOURCE SCRAPING
+    // Letterboxd's filtered RSS feeds (by rating/decade) return 404s
+    // Instead: Use main RSS feed + films page for broader coverage
     const rssFeeds = [
       { name: 'Recent Activity', url: `${baseUrl}/rss/`, minRating: 3.5 },
-      { name: '5-Star Films', url: `${baseUrl}/films/rated/5/rss/`, minRating: 5.0 },
-      { name: '4.5-Star Films', url: `${baseUrl}/films/rated/4.5/rss/`, minRating: 4.5 },
-      { name: '2020s Films', url: `${baseUrl}/films/decade/2020s/rss/`, minRating: 3.5 },
-      { name: '2010s Films', url: `${baseUrl}/films/decade/2010s/rss/`, minRating: 3.5 },
-      { name: '2000s Films', url: `${baseUrl}/films/decade/2000s/rss/`, minRating: 3.5 },
+      { name: 'All Films Page 1', url: `${baseUrl}/films/page/1/`, minRating: 3.5, isHtml: true },
+      { name: 'All Films Page 2', url: `${baseUrl}/films/page/2/`, minRating: 3.5, isHtml: true },
     ];
     
     const seenFilms = new Map<string, Movie>(); // Use Map to deduplicate by filmId
@@ -56,53 +54,93 @@ async function scrapeLetterboxdProfile(username: string): Promise<ProfileData> {
       try {
         console.log(`📡 Fetching ${feed.name}: ${feed.url}`);
         
-        const rssResponse = await axios.get(feed.url, {
+        const response = await axios.get(feed.url, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
           },
           timeout: 10000,
         });
         
-        const $rss = cheerio.load(rssResponse.data, { xmlMode: true });
         let feedCount = 0;
         
-        $rss('item').each((_, element) => {
-          const filmTitle = $rss(element).find('letterboxd\\:filmTitle, filmTitle').text();
-          const filmYear = $rss(element).find('letterboxd\\:filmYear, filmYear').text();
-          const memberRating = parseFloat($rss(element).find('letterboxd\\:memberRating, memberRating').text() || '0');
-          const link = $rss(element).find('link').text();
-          
-          if (filmTitle && filmYear && memberRating > 0) {
-            const filmId = `${filmTitle}_${filmYear}`;
+        if (feed.isHtml) {
+          // Parse HTML film page
+          const $html = cheerio.load(response.data);
+          $html('li.poster-container').each((_, element) => {
+            const filmLink = $html(element).find('div[data-film-slug]');
+            const filmSlug = filmLink.attr('data-film-slug');
+            const filmName = filmLink.attr('data-film-name');
+            const ratingSpan = $html(element).find('span.rating');
+            const ratingClass = ratingSpan.attr('class') || '';
             
-            // Only add if meets minimum rating and not already seen
-            if (memberRating >= feed.minRating && !seenFilms.has(filmId)) {
-              const movie: Movie = {
-                title: filmTitle,
-                year: filmYear,
-                rating: memberRating,
-                letterboxd_url: link,
-              };
+            // Extract rating from class (e.g., "rated-10" = 5 stars, "rated-8" = 4 stars)
+            const ratingMatch = ratingClass.match(/rated-(\d+)/);
+            const memberRating = ratingMatch ? parseFloat(ratingMatch[1]) / 2 : 0;
+            
+            if (filmName && filmSlug && memberRating >= feed.minRating) {
+              // Extract year from slug or film name
+              const yearMatch = filmSlug.match(/-(\d{4})$/);
+              const filmYear = yearMatch ? yearMatch[1] : '';
               
-              seenFilms.set(filmId, movie);
-              feedCount++;
+              const filmId = `${filmName}_${filmYear}`;
               
-              // Track 5-star ratings as "loved"
-              if (memberRating === 5.0) {
-                lovedMovies.push({ ...movie, loved: true });
+              if (!seenFilms.has(filmId)) {
+                const movie: Movie = {
+                  title: filmName,
+                  year: filmYear,
+                  rating: memberRating,
+                  letterboxd_url: `https://letterboxd.com/film/${filmSlug}/`,
+                };
+                
+                seenFilms.set(filmId, movie);
+                feedCount++;
+                
+                if (memberRating === 5.0) {
+                  lovedMovies.push({ ...movie, loved: true });
+                }
               }
             }
-          }
-        });
+          });
+        } else {
+          // Parse RSS feed
+          const $rss = cheerio.load(response.data, { xmlMode: true });
+          
+          $rss('item').each((_, element) => {
+            const filmTitle = $rss(element).find('letterboxd\\:filmTitle, filmTitle').text();
+            const filmYear = $rss(element).find('letterboxd\\:filmYear, filmYear').text();
+            const memberRating = parseFloat($rss(element).find('letterboxd\\:memberRating, memberRating').text() || '0');
+            const link = $rss(element).find('link').text();
+            
+            if (filmTitle && filmYear && memberRating >= feed.minRating) {
+              const filmId = `${filmTitle}_${filmYear}`;
+              
+              if (!seenFilms.has(filmId)) {
+                const movie: Movie = {
+                  title: filmTitle,
+                  year: filmYear,
+                  rating: memberRating,
+                  letterboxd_url: link,
+                };
+                
+                seenFilms.set(filmId, movie);
+                feedCount++;
+                
+                if (memberRating === 5.0) {
+                  lovedMovies.push({ ...movie, loved: true });
+                }
+              }
+            }
+          });
+        }
         
         console.log(`   ✅ ${feed.name}: +${feedCount} unique films`);
         
-        // Small delay between requests to be polite
-        await new Promise(resolve => setTimeout(resolve, 250));
+        // Small delay between requests
+        await new Promise(resolve => setTimeout(resolve, 300));
         
       } catch (error) {
         console.error(`   ❌ ${feed.name} failed:`, error instanceof Error ? error.message : 'Unknown error');
-        // Continue with other feeds even if one fails
+        // Continue with other feeds
       }
     }
     

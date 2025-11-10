@@ -314,8 +314,12 @@ export default function Home() {
         }
 
         const aiRecsData = await aiRecsResponse.json();
-        const aiRecommendations = aiRecsData.data.recommendations;
+        const aiRecommendations = aiRecsData.data?.recommendations || aiRecsData.recommendations || [];
         console.log(`✅ GPT recommended ${aiRecommendations.length} movies`);
+
+        if (!aiRecommendations || aiRecommendations.length === 0) {
+          throw new Error('No AI recommendations received');
+        }
 
         // Step 4c: Enrich AI recommendations with OMDb metadata (batch of 30)
         setLoadingStep('Enriching recommendations with metadata...');
@@ -330,12 +334,18 @@ export default function Home() {
         });
 
         if (!enrichAIResponse.ok) {
-          throw new Error('Failed to enrich AI recommendations');
+          const errorText = await enrichAIResponse.text();
+          console.error('Enrich error:', errorText);
+          throw new Error(`Failed to enrich AI recommendations: ${errorText}`);
         }
 
         const enrichAIData = await enrichAIResponse.json();
-        const enrichedAICandidates = enrichAIData.data.enriched_movies;
+        const enrichedAICandidates = enrichAIData.data?.enriched_movies || enrichAIData.enriched_movies || [];
         console.log(`✅ Enriched ${enrichedAICandidates.length} AI recommendations`);
+
+        if (!enrichedAICandidates || enrichedAICandidates.length === 0) {
+          throw new Error('No enriched candidates received from OMDb');
+        }
 
         // Step 5: Generate final recommendations from enriched AI candidates
         setLoadingStep('Generating personalized recommendations...');
