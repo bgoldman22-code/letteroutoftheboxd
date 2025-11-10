@@ -256,6 +256,11 @@ export const handler: Handler = async (event) => {
     const recommendations: Recommendation[] = [];
     
     for (const candidate of candidate_movies) {
+      // Skip candidates without elite analysis (only analyzed movies have this)
+      if (!candidate.elite_analysis || !candidate.elite_analysis.dimensional_scores) {
+        continue;
+      }
+      
       const similarity = calculateSimilarity(fingerprint, candidate, userMovieIds);
       
       if (similarity.score > 0) {

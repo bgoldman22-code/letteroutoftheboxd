@@ -233,12 +233,12 @@ export default function Home() {
 
       console.log(`📊 Formatted ${analyzedMoviesArray.length} movies for recommendations`);
 
-      // Step 4: Generate recommendations
+      // Step 4: Generate recommendations using simple metadata-based matching
       setLoadingStep('Generating personalized recommendations...');
       console.log('🎬 Step 4/4: Generating personalized recommendations...');
       console.log(`📊 Using ${enrichedMovies.length} enriched movies as candidate pool`);
       
-      const recsResponse = await fetch('/.netlify/functions/get-recommendations', {
+      const recsResponse = await fetch('/.netlify/functions/get-simple-recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
