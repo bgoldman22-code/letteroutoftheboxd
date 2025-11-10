@@ -107,7 +107,7 @@ const handler: Handler = async (event) => {
   }
 
   try {
-    const { movies, round1Selections = [], round2Selections = [] } = JSON.parse(event.body || '{}');
+    const { movies, round1Selections = [], round2Selections = [], round1Shown = [] } = JSON.parse(event.body || '{}');
 
     if (!movies || !Array.isArray(movies) || movies.length === 0) {
       return {
@@ -133,10 +133,10 @@ const handler: Handler = async (event) => {
       };
     }
 
-    // ROUND 2: Diverse from Round 1 selections
+    // ROUND 2: Diverse from Round 1 selections, excluding Round 1 shown movies
     if (round2Selections.length === 0) {
-      // Remove Round 1 movies from pool
-      const round1Titles = new Set(round1Selections.map((m: Movie) => `${m.title}-${m.year}`));
+      // Remove Round 1 shown movies from pool (both selected AND unselected)
+      const round1Titles = new Set(round1Shown.map((m: Movie) => `${m.title}-${m.year}`));
       const remainingPool = movies.filter((m: Movie) => 
         !round1Titles.has(`${m.title}-${m.year}`)
       );
@@ -155,7 +155,7 @@ const handler: Handler = async (event) => {
     }
 
     // ROUND 3: Edge cases and gap-filling
-    const round1Titles = new Set(round1Selections.map((m: Movie) => `${m.title}-${m.year}`));
+    const round1Titles = new Set(round1Shown.map((m: Movie) => `${m.title}-${m.year}`));
     const round2Titles = new Set(round2Selections.map((m: Movie) => `${m.title}-${m.year}`));
     const remainingPool = movies.filter((m: Movie) => 
       !round1Titles.has(`${m.title}-${m.year}`) && 

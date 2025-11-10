@@ -20,6 +20,7 @@ interface Movie {
   actors?: string[];
   plot?: string;
   runtime?: string;
+  loved?: boolean;
 }
 
 interface RecommendationData {
@@ -200,9 +201,31 @@ export default function Home() {
       }
 
       const analyzeData = await analyzeResponse.json();
-      const analyzedMovies = analyzeData.analyzed;
+      const analyzedMoviesObj = analyzeData.analyzed;
       
       console.log(`✅ Analyzed ${analyzeData.processed}/${analyzeData.total_movies} movies with 62 dimensions`);
+
+      // Transform analyzed object to array format expected by recommendations API
+      const analyzedMoviesArray = selectedMovies.map(movie => {
+        const key = `${movie.title} (${movie.year})`;
+        const analysis = analyzedMoviesObj[key];
+        
+        return {
+          title: movie.title,
+          year: movie.year || '',
+          rating: movie.rating,
+          loved: movie.loved,
+          elite_analysis: analysis || {
+            dimensional_scores: {},
+            human_condition_themes: [],
+            core_essence: '',
+            viewer_resonance: '',
+            aesthetic_signature: ''
+          }
+        };
+      }).filter(m => m.elite_analysis.dimensional_scores && Object.keys(m.elite_analysis.dimensional_scores).length > 0);
+
+      console.log(`📊 Formatted ${analyzedMoviesArray.length} movies for recommendations`);
 
       // Step 4: Generate recommendations
       setLoadingStep('Generating personalized recommendations...');
@@ -213,8 +236,8 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_movies: analyzedMovies,
-          candidate_movies: analyzedMovies, // TODO: Use larger pool in production
+          user_movies: analyzedMoviesArray,
+          candidate_movies: analyzedMoviesArray, // TODO: Use larger pool in production
         }),
       });
 

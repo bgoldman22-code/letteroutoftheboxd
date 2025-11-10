@@ -15,6 +15,8 @@ interface EnrichedMovie extends Movie {
   director?: string;
   actors?: string[];
   plot?: string;
+  poster?: string;
+  runtime?: string;
   imdb_rating?: string;
   imdb_id?: string;
 }
@@ -40,6 +42,8 @@ async function enrichMovieWithOMDb(movie: Movie, apiKey: string): Promise<Enrich
         director: data.Director,
         actors: data.Actors ? data.Actors.split(', ') : [],
         plot: data.Plot,
+        poster: data.Poster !== 'N/A' ? data.Poster : undefined,
+        runtime: data.Runtime,
         imdb_rating: data.imdbRating,
         imdb_id: data.imdbID,
       };

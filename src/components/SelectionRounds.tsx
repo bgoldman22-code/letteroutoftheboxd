@@ -26,6 +26,8 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
   const [selectedInRound, setSelectedInRound] = useState<Set<string>>(new Set());
   const [round1Selections, setRound1Selections] = useState<Movie[]>([]);
   const [round2Selections, setRound2Selections] = useState<Movie[]>([]);
+  const [round1Shown, setRound1Shown] = useState<Movie[]>([]); // Track all Round 1 movies
+  const [round2Shown, setRound2Shown] = useState<Movie[]>([]); // Track all Round 2 movies
   const [instruction, setInstruction] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -48,6 +50,7 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
           movies,
           round1Selections,
           round2Selections,
+          round1Shown, // Pass shown movies to exclude from next rounds
         }),
       });
 
@@ -58,6 +61,13 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
       const data = await response.json();
       setRoundMovies(data.movies);
       setInstruction(data.instruction);
+      
+      // Track which movies were shown in this round
+      if (currentRound === 1) {
+        setRound1Shown(data.movies);
+      } else if (currentRound === 2) {
+        setRound2Shown(data.movies);
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
