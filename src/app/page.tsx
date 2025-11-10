@@ -286,17 +286,25 @@ export default function Home() {
         recommendations: recsData.recommendations.map((rec: any) => ({
           title: rec.title,
           year: rec.year,
-          similarity_score: rec.similarity_score,
-          dimensional_match: rec.dimensional_match,
-          thematic_match: rec.thematic_match,
+          poster: rec.poster,
+          genres: rec.genres,
+          director: rec.director,
+          actors: rec.actors,
+          plot: rec.plot,
+          runtime: rec.runtime,
+          imdb_rating: rec.imdb_rating,
+          match_score: rec.match_score,
           match_reasons: rec.match_reasons,
-          core_essence: rec.elite_analysis.core_essence,
-          aesthetic_signature: rec.elite_analysis.aesthetic_signature,
+          // Simple recommendations don't have elite_analysis
+          core_essence: rec.elite_analysis?.core_essence,
+          aesthetic_signature: rec.elite_analysis?.aesthetic_signature,
         })),
         taste_profile: {
           top_themes: recsData.taste_fingerprint.top_themes,
           avg_rating: recsData.taste_fingerprint.avg_rating,
           loved_movies_count: recsData.taste_fingerprint.loved_movies_count,
+          top_genres: recsData.taste_fingerprint.top_genres,
+          favorite_directors: recsData.taste_fingerprint.favorite_directors,
         },
       });
 
@@ -448,10 +456,10 @@ export default function Home() {
                         <h3 className="font-semibold text-xl mb-1">{movie.title}</h3>
                         {movie.year && <p className="text-sm text-gray-400">{movie.year}</p>}
                       </div>
-                      {movie.similarity_score && (
+                      {(movie.match_score !== undefined || movie.similarity_score !== undefined) && (
                         <div className="text-right">
                           <div className="text-2xl font-bold text-purple-400">
-                            {Math.round(movie.similarity_score * 100)}%
+                            {Math.round((movie.match_score || movie.similarity_score || 0) * 100)}%
                           </div>
                           <div className="text-xs text-gray-400">Match</div>
                         </div>
