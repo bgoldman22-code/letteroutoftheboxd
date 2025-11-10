@@ -38,85 +38,65 @@ async function scrapeLetterboxdProfile(username: string): Promise<ProfileData> {
     
     console.log(`📊 Profile stats: ${totalFilms} total films, ${filmsThisYear} this year`);
     
-    // Scrape ratings page to get MORE movies (up to 200)
-    // Format: /username/films/by/member-rating/
-    const ratingsUrl = `${baseUrl}/films/by/member-rating/`;
+    // Use RSS feed to get rated movies (much more reliable!)
+    // RSS typically returns the most recent 50-100 entries
+    const rssUrl = `${baseUrl}/rss/`;
+    console.log(`� Fetching RSS feed: ${rssUrl}`);
+    
+    const rssResponse = await axios.get(rssUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+      },
+    });
+    
+    const $rss = cheerio.load(rssResponse.data, { xmlMode: true });
+    
     const allRatedMovies: Movie[] = [];
     const lovedMovies: Movie[] = [];
-    const seenFilms = new Set<string>();
+    const seenFilms = new Set<string>(); // Track unique films
     
-    // Scrape first 3 pages to get ~150-200 movies
-    for (let page = 1; page <= 3; page++) {
-      const pageUrl = page === 1 ? ratingsUrl : `${ratingsUrl}page/${page}/`;
-      console.log(`📄 Scraping page ${page}: ${pageUrl}`);
+    $rss('item').each((_, element) => {
+      const filmTitle = $rss(element).find('letterboxd\\:filmTitle, filmTitle').text();
+      const filmYear = $rss(element).find('letterboxd\\:filmYear, filmYear').text();
+      const memberRating = parseFloat($rss(element).find('letterboxd\\:memberRating, memberRating').text() || '0');
+      const link = $rss(element).find('link').text();
       
-      try {
-        const pageResponse = await axios.get(pageUrl, {
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-          },
-        });
+      if (filmTitle && filmYear && memberRating > 0) {
+        const filmId = `${filmTitle}_${filmYear}`;
         
-        const $page = cheerio.load(pageResponse.data);
-        let moviesOnPage = 0;
+        // Skip duplicates (rewatches)
+        if (seenFilms.has(filmId)) {
+          return;
+        }
+        seenFilms.add(filmId);
         
-        $page('.poster-container').each((_, element) => {
-          const filmDiv = $page(element).find('.film-poster');
-          const filmTitle = filmDiv.attr('data-film-name') || '';
-          const filmSlug = filmDiv.attr('data-film-slug') || '';
-          const filmYear = filmDiv.attr('data-film-release-year') || '';
+        // ONLY include movies rated 3.5 stars (7/10) or higher - focus on what they LOVED
+        if (memberRating >= 3.5) {
+          const movie: Movie = {
+            title: filmTitle,
+            year: filmYear,
+            rating: memberRating,
+            letterboxd_url: link,
+          };
           
-          // Get rating from parent element
-          const ratingSpan = $page(element).find('.rating');
-          const ratingText = ratingSpan.attr('class') || '';
-          const ratingMatch = ratingText.match(/rated-(\d+)/);
-          const memberRating = ratingMatch ? parseInt(ratingMatch[1]) / 2 : 0; // Convert 1-10 to 0.5-5
+          allRatedMovies.push(movie);
           
-          if (filmTitle && filmYear && memberRating >= 3.5) {
-            const filmId = `${filmTitle}_${filmYear}`;
-            
-            if (!seenFilms.has(filmId)) {
-              seenFilms.add(filmId);
-              moviesOnPage++;
-              
-              const movie: Movie = {
-                title: filmTitle,
-                year: filmYear,
-                rating: memberRating,
-                letterboxd_url: `https://letterboxd.com/film/${filmSlug}/`,
-              };
-              
-              allRatedMovies.push(movie);
-              
-              if (memberRating === 5.0) {
-                lovedMovies.push({ ...movie, loved: true });
-              }
-            }
+          // Consider 5-star ratings as "loved"
+          if (memberRating === 5.0) {
+            lovedMovies.push({ ...movie, loved: true });
           }
-        });
-        
-        console.log(`  ✅ Found ${moviesOnPage} rated movies on page ${page}`);
-        
-        // Stop if we got no movies (reached end of ratings)
-        if (moviesOnPage === 0) break;
-        
-        // Small delay to be nice to Letterboxd servers
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-      } catch (pageError: any) {
-        console.error(`  ❌ Error scraping page ${page}:`, pageError.message);
-        break;
+        }
       }
-    }
+    });
     
-    console.log(`✅ Total scraped: ${allRatedMovies.length} rated movies (3.5+ stars), ${lovedMovies.length} loved (5 stars)`);
+    console.log(`✅ RSS feed scraped: ${allRatedMovies.length} rated movies (3.5+ stars), ${lovedMovies.length} loved (5 stars)`);
     
     return {
       username,
       total_films: totalFilms,
       films_this_year: filmsThisYear,
       loved_movies: lovedMovies,
-      all_rated_movies: allRatedMovies, // Return all for rounds system
+      all_rated_movies: allRatedMovies, // Return all movies from RSS
     };
     
   } catch (error: any) {
