@@ -21,6 +21,8 @@ interface Movie {
   plot?: string;
   runtime?: string;
   loved?: boolean;
+  imdb_rating?: string;
+  match_score?: number;
 }
 
 interface RecommendationData {
@@ -212,15 +214,27 @@ export default function Home() {
       }
 
       // Transform analyzed object to array format expected by recommendations API
+      // IMPORTANT: Merge analyzed data with enriched metadata for taste profile extraction
       const analyzedMoviesArray = selectedMovies.map(movie => {
         const key = `${movie.title} (${movie.year})`;
         const analysis = analyzedMoviesObj[key];
+        
+        // Find the enriched version of this movie for metadata
+        const enriched = enrichedMovies.find(e => 
+          e.title === movie.title && e.year === movie.year
+        );
         
         return {
           title: movie.title,
           year: movie.year || '',
           rating: movie.rating,
           loved: movie.loved,
+          // Include enriched metadata for taste profile extraction
+          genres: enriched?.genres || [],
+          director: enriched?.director,
+          actors: enriched?.actors || [],
+          poster: enriched?.poster,
+          imdb_rating: enriched?.imdb_rating,
           elite_analysis: analysis || {
             dimensional_scores: {},
             human_condition_themes: [],
