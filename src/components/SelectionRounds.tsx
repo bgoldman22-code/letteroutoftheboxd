@@ -26,17 +26,13 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
   const [selectedInRound, setSelectedInRound] = useState<Set<string>>(new Set());
   const [round1Selections, setRound1Selections] = useState<Movie[]>([]);
   const [round2Selections, setRound2Selections] = useState<Movie[]>([]);
-  const [round3Selections, setRound3Selections] = useState<Movie[]>([]);
-  const [round4Selections, setRound4Selections] = useState<Movie[]>([]);
   const [round1Shown, setRound1Shown] = useState<Movie[]>([]); // Track all Round 1 movies
   const [round2Shown, setRound2Shown] = useState<Movie[]>([]); // Track all Round 2 movies
-  const [round3Shown, setRound3Shown] = useState<Movie[]>([]); // Track all Round 3 movies
-  const [round4Shown, setRound4Shown] = useState<Movie[]>([]); // Track all Round 4 movies
   const [instruction, setInstruction] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const TOTAL_ROUNDS = 5;
+  const TOTAL_ROUNDS = 3; // Reduced from 5 to work with ~30-50 movies from RSS
 
   // Load round movies on mount and round changes
   useEffect(() => {
@@ -73,10 +69,6 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
         setRound1Shown(data.movies);
       } else if (currentRound === 2) {
         setRound2Shown(data.movies);
-      } else if (currentRound === 3) {
-        setRound3Shown(data.movies);
-      } else if (currentRound === 4) {
-        setRound4Shown(data.movies);
       }
     } catch (err: any) {
       setError(err.message);
@@ -117,21 +109,11 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
       setRound2Selections(selected);
       setCurrentRound(3);
       await loadRound();
-    } else if (currentRound === 3) {
-      setRound3Selections(selected);
-      setCurrentRound(4);
-      await loadRound();
-    } else if (currentRound === 4) {
-      setRound4Selections(selected);
-      setCurrentRound(5);
-      await loadRound();
     } else {
-      // Round 5 complete - combine all selections
+      // Round 3 complete - combine all selections (9 movies total)
       const allSelected = [
         ...round1Selections,
         ...round2Selections,
-        ...round3Selections,
-        ...round4Selections,
         ...selected
       ];
       onComplete(allSelected);
@@ -158,10 +140,10 @@ export default function SelectionRounds({ movies, onComplete, onBack }: Selectio
           
           {/* Progress */}
           <div className="flex justify-center items-center gap-2 mb-4">
-            {[1, 2, 3, 4, 5].map(round => (
+            {[1, 2, 3].map(round => (
               <div
                 key={round}
-                className={`w-12 h-2 rounded-full transition-all ${
+                className={`w-16 h-2 rounded-full transition-all ${
                   round < currentRound
                     ? 'bg-green-500'
                     : round === currentRound
