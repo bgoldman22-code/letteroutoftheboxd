@@ -9,9 +9,10 @@
   NODE_VERSION = "20"
 
 [functions]
-  # Set maximum timeout (26s for paid plan)
-  timeout = 26
+  # Maximum timeout is 26s on paid plan (default is 10s)
   node_bundler = "esbuild"
+
+# Note: Timeout is configured in Netlify UI under Site settings > Functions
 
 [[redirects]]
   from = "/*"
