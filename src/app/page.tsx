@@ -236,14 +236,14 @@ export default function Home() {
       // Step 4: Generate recommendations
       setLoadingStep('Generating personalized recommendations...');
       console.log('🎬 Step 4/4: Generating personalized recommendations...');
+      console.log(`📊 Using ${enrichedMovies.length} enriched movies as candidate pool`);
       
-      // For now, use the same movies as candidates (in production, fetch a larger candidate pool)
       const recsResponse = await fetch('/.netlify/functions/get-recommendations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_movies: analyzedMoviesArray,
-          candidate_movies: analyzedMoviesArray, // TODO: Use larger pool in production
+          candidate_movies: enrichedMovies, // Use the full enriched pool from user's profile
         }),
       });
 
