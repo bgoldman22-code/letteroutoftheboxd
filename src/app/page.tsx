@@ -326,6 +326,7 @@ export default function Home() {
         console.log('🎬 Step 4c/6: Enriching AI recommendations with OMDb...');
       
         const enrichBatch = aiRecommendations.slice(0, 30); // Enrich first 30
+        console.log(`📦 Sending ${enrichBatch.length} movies to enrich:`, enrichBatch.slice(0, 3));
       
         const enrichAIResponse = await fetch('/.netlify/functions/enrich-movies', {
           method: 'POST',
@@ -340,10 +341,12 @@ export default function Home() {
         }
 
         const enrichAIData = await enrichAIResponse.json();
-        const enrichedAICandidates = enrichAIData.data?.enriched_movies || enrichAIData.enriched_movies || [];
+        console.log(`📥 Enrich response structure:`, Object.keys(enrichAIData));
+        const enrichedAICandidates = enrichAIData.data || enrichAIData.enriched_movies || [];
         console.log(`✅ Enriched ${enrichedAICandidates.length} AI recommendations`);
 
         if (!enrichedAICandidates || enrichedAICandidates.length === 0) {
+          console.error('Full enrich response:', JSON.stringify(enrichAIData).slice(0, 500));
           throw new Error('No enriched candidates received from OMDb');
         }
 
