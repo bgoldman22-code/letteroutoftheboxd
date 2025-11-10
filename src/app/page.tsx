@@ -179,9 +179,10 @@ export default function Home() {
     setError('');
 
     try {
-      // Step 3: Analyze the 9 selected movies with 62-dimension AI model
-      setLoadingStep(`Analyzing your 9 selected movies with Elite 62-Dimension AI...`);
+      // Step 3: Analyze the 15 selected movies with 62-dimension AI model
+      setLoadingStep(`Analyzing your 15 selected movies with Elite 62-Dimension AI...`);
       console.log('🎬 Step 3/4: Starting Elite AI Analysis of selected movies...');
+      console.log(`📊 Processing ${selectedMovies.length} strategically-selected movies`);
       
       const analyzeResponse = await fetch('/.netlify/functions/analyze-movie-sync', {
         method: 'POST',
@@ -204,6 +205,11 @@ export default function Home() {
       const analyzedMoviesObj = analyzeData.analyzed;
       
       console.log(`✅ Analyzed ${analyzeData.processed}/${analyzeData.total_movies} movies with 62 dimensions`);
+
+      // Check if we got any successful analyses
+      if (analyzeData.processed === 0) {
+        throw new Error('Failed to analyze any movies. The AI service may be experiencing issues. Please try again.');
+      }
 
       // Transform analyzed object to array format expected by recommendations API
       const analyzedMoviesArray = selectedMovies.map(movie => {

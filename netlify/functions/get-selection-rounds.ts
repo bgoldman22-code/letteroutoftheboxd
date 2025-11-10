@@ -107,7 +107,17 @@ const handler: Handler = async (event) => {
   }
 
   try {
-    const { movies, round1Selections = [], round2Selections = [], round1Shown = [] } = JSON.parse(event.body || '{}');
+    const {
+      movies,
+      round1Selections = [],
+      round2Selections = [],
+      round3Selections = [],
+      round4Selections = [],
+      round1Shown = [],
+      round2Shown = [],
+      round3Shown = [],
+      round4Shown = []
+    } = JSON.parse(event.body || '{}');
 
     if (!movies || !Array.isArray(movies) || movies.length === 0) {
       return {
@@ -116,6 +126,20 @@ const handler: Handler = async (event) => {
         body: JSON.stringify({ error: 'Movies array is required' }),
       };
     }
+
+    // Helper to get excluded movies
+    const getExcludedTitles = (...shownArrays: Movie[][]) => {
+      const excluded = new Set<string>();
+      shownArrays.forEach(arr => {
+        arr.forEach(m => excluded.add(`${m.title}-${m.year}`));
+      });
+      return excluded;
+    };
+
+    // Helper to filter remaining pool
+    const getRemainingPool = (excludedTitles: Set<string>) => {
+      return movies.filter((m: Movie) => !excludedTitles.has(`${m.title}-${m.year}`));
+    };
 
     // ROUND 1: Random diverse sample
     if (round1Selections.length === 0) {
@@ -133,14 +157,10 @@ const handler: Handler = async (event) => {
       };
     }
 
-    // ROUND 2: Diverse from Round 1 selections, excluding Round 1 shown movies
+    // ROUND 2: Diverse from Round 1
     if (round2Selections.length === 0) {
-      // Remove Round 1 shown movies from pool (both selected AND unselected)
-      const round1Titles = new Set(round1Shown.map((m: Movie) => `${m.title}-${m.year}`));
-      const remainingPool = movies.filter((m: Movie) => 
-        !round1Titles.has(`${m.title}-${m.year}`)
-      );
-      
+      const excluded = getExcludedTitles(round1Shown);
+      const remainingPool = getRemainingPool(excluded);
       const round2 = selectDiverseMovies(remainingPool, round1Selections, 10);
       
       return {
@@ -154,23 +174,65 @@ const handler: Handler = async (event) => {
       };
     }
 
-    // ROUND 3: Edge cases and gap-filling
-    const round1Titles = new Set(round1Shown.map((m: Movie) => `${m.title}-${m.year}`));
-    const round2Titles = new Set(round2Selections.map((m: Movie) => `${m.title}-${m.year}`));
-    const remainingPool = movies.filter((m: Movie) => 
-      !round1Titles.has(`${m.title}-${m.year}`) && 
-      !round2Titles.has(`${m.title}-${m.year}`)
+    // ROUND 3: Diverse from Rounds 1 & 2
+    if (round3Selections.length === 0) {
+      const excluded = getExcludedTitles(round1Shown, round2Shown);
+      const remainingPool = getRemainingPool(excluded);
+      const allSelections = [...round1Selections, ...round2Selections];
+      const round3 = selectDiverseMovies(remainingPool, allSelections, 10);
+      
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          round: 3,
+          movies: round3,
+          instruction: 'Keep going - 3 more films that speak to you!',
+        }),
+      };
+    }
+
+    // ROUND 4: Diverse from Rounds 1, 2 & 3
+    if (round4Selections.length === 0) {
+      const excluded = getExcludedTitles(round1Shown, round2Shown, round3Shown);
+      const remainingPool = getRemainingPool(excluded);
+      const allSelections = [...round1Selections, ...round2Selections, ...round3Selections];
+      const round4 = selectDiverseMovies(remainingPool, allSelections, 10);
+      
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          round: 4,
+          movies: round4,
+          instruction: 'Almost there - pick 3 more to refine your taste profile!',
+        }),
+      };
+    }
+
+    // ROUND 5: Final round - edge cases and gap-filling
+    const excluded = getExcludedTitles(round1Shown, round2Shown, round3Shown, round4Shown);
+    const remainingPool = getRemainingPool(excluded);
+    const allPreviousSelections = [
+      ...round1Selections,
+      ...round2Selections,
+      ...round3Selections,
+      ...round4Selections
+    ];
+    const round5 = selectEdgeCaseMovies(
+      remainingPool,
+      round1Selections,
+      [...round2Selections, ...round3Selections, ...round4Selections],
+      10
     );
-    
-    const round3 = selectEdgeCaseMovies(remainingPool, round1Selections, round2Selections, 10);
     
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({
-        round: 3,
-        movies: round3,
-        instruction: 'Final round - pick 3 more to complete your taste profile!',
+        round: 5,
+        movies: round5,
+        instruction: 'Final round - pick your last 3 to complete your cinematic DNA!',
       }),
     };
 

@@ -191,7 +191,15 @@ Runtime: ${movie.runtime || 'Unknown'}
           });
 
           const responseText = completion.choices[0]?.message?.content?.trim() || '{}';
-          const analysis: AnalysisResult = JSON.parse(responseText);
+          
+          // Strip markdown code blocks if present
+          let cleanedJson = responseText;
+          if (cleanedJson.startsWith('```')) {
+            // Remove ```json or ``` at start and ``` at end
+            cleanedJson = cleanedJson.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+          }
+          
+          const analysis: AnalysisResult = JSON.parse(cleanedJson);
 
           analyzed[`${movie.title} (${movie.year})`] = analysis;
           console.log(`  ✅ ${movie.title}: Complete`);
