@@ -17,11 +17,13 @@ export interface JobStatus {
 function getJobStore() {
   // Use explicit site ID and token from environment
   const siteID = process.env.NETLIFY_SITE_ID || '58b620ff-bd3c-44c0-8f6f-0ab0ce8f724d';
-  const token = process.env.NETLIFY_AUTH_TOKEN;
+  // Use NETLIFY_FUNCTIONS_TOKEN (automatic, has correct permissions) instead of personal token
+  const token = process.env.NETLIFY_FUNCTIONS_TOKEN || process.env.NETLIFY_AUTH_TOKEN;
   
   console.log('🔍 DEBUG - Netlify Blobs Config:');
   console.log('  - NETLIFY_SITE_ID:', siteID ? `${siteID.substring(0, 8)}...` : 'MISSING');
-  console.log('  - NETLIFY_AUTH_TOKEN:', token ? `${token.substring(0, 6)}... (length: ${token.length})` : 'MISSING');
+  console.log('  - Token type:', token === process.env.NETLIFY_FUNCTIONS_TOKEN ? 'NETLIFY_FUNCTIONS_TOKEN (automatic)' : 'NETLIFY_AUTH_TOKEN (personal)');
+  console.log('  - Token value:', token ? `${token.substring(0, 6)}... (length: ${token.length})` : 'MISSING');
   console.log('  - All env vars available:', Object.keys(process.env).filter(k => k.includes('NETLIFY')));
   
   if (token) {
@@ -41,7 +43,7 @@ function getJobStore() {
   }
   
   // Fallback to simple name (shouldn't happen in production)
-  console.warn('⚠️  NETLIFY_AUTH_TOKEN not found, using default store config');
+  console.warn('⚠️  No token found, using default store config');
   return getStore('jobs');
 }
 
